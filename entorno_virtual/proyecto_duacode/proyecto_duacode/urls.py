@@ -22,8 +22,8 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('core.urls')), #Incluimos las rutas de la API para empleados
-    path('api/', include('proyectos.urls')),  # Rutas de proyectos
+    path('api/empleados/', include('core.urls')), #Incluimos las rutas de la API para empleados
+    path('api/proyectos/', include('proyectos.urls')),  # Rutas de proyectos
     path('upload/', include('subir_archivo.urls')),  # Asegúrate de que la ruta sea correcta
     #path('', upload_file, name='upload_file'),  # Ruta para la página de carga# Incluye las URLs de file_upload
     #path('', subir_archivo, name='subir_archivo'),  # Ruta para la página de carga
