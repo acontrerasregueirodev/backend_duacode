@@ -6,3 +6,5 @@ class SubirArchivo(models.Model):
 
     def __str__(self):
         return self.file.name
+    class Meta:
+        db_table = 'subir_archivo'  # Especifica el nombre de la tabla
