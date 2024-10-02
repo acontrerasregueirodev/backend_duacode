@@ -5,8 +5,7 @@ from .views import EmpleadoViewset
 from proyectos.views import ProyectoViewSet
 
 router = DefaultRouter()
-router.register(r'empleados', EmpleadoViewset)  # Genera rutas como /api/empleados/
-router.register(r'proyectos', ProyectoViewSet)  # Genera rutas como /api/proyectos/
+router.register(r'', EmpleadoViewset)  # Genera rutas como /api/empleados/
 
 
 urlpatterns = [

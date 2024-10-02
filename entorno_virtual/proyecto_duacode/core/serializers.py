@@ -12,4 +12,17 @@ class EmpleadoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Empleado
-        fields = ['id', 'nombre', 'apellido_1', 'apellido_2', 'email', 'telefono', 'puesto', 'proyectos']
+        fields = [
+            'id',  # Incluye el id si lo necesitas
+            'nombre',
+            'apellido_1',
+            'apellido_2',
+            'email',
+            'telefono',
+            'puesto',
+            'fecha_contratación',
+            'cumpleaños',
+            'is_on_leave',
+            'foto',
+            'proyectos',
+        ]
