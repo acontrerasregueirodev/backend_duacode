@@ -36,12 +36,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    #Apps instaladas por Dev Team
+    #Apps instaladas por nosotros
     'rest_framework',
     'core',
     'corsheaders',
     'proyectos',
     'subir_archivo',
+    'sedes',
 ]
 # Nuestra configuración de rest framework
  
