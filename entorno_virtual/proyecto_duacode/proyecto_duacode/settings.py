@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'proyectos',
     'subir_archivo',
     'sedes',
+    'email_sender',
 ]
 # Nuestra configuración de rest framework
  
@@ -156,3 +157,15 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# CONFIGURACION EMAIL SENDER GMAIL
+# settings.py
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'adrian.contreras.rookie@gmail.com'  
+EMAIL_HOST_PASSWORD = 'Figura00+'  # Reemplaza con tu contraseña de Gmail
+

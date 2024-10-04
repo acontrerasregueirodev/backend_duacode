@@ -26,6 +26,7 @@ urlpatterns = [
     path('api/proyectos/', include('proyectos.urls')),  # Rutas de proyectos
     path('upload/', include('subir_archivo.urls')),  # Asegúrate de que la ruta sea correcta
     path('api/',include('sedes.urls')),
+    path('api/email/', include('email_sender.urls')),
     #path('', upload_file, name='upload_file'),  # Ruta para la página de carga# Incluye las URLs de file_upload
     #path('', subir_archivo, name='subir_archivo'),  # Ruta para la página de carga
 
