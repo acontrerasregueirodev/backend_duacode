@@ -1,7 +1,7 @@
 Como actualizar el Backend
   Se sustituye la carpeta entorno_virtual por la que habeis descargado y descomprimido.
   Posteriormente eliminar la base de datos esta en entorno_virtual\proyecto_duacode\db.sqlite3
-  Eliminar tambien los ficheros en en entorno_virtual\proyecto_duacode\media\generar_empleados
+  Eliminar tambien los ficheros en en entorno_virtual\proyecto_duacode\media\empleados
   Ahora desde entorno_virtual\proyecto_duacode ejecutamos:
     python manage.py makemigrations       -> Esto prepara la BBDD
     python manage.py migrate              -> Con esto la creamos
