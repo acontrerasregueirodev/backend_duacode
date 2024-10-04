@@ -25,4 +25,6 @@ class EmpleadoSerializer(serializers.ModelSerializer):
             'is_on_leave',
             'foto',
             'proyectos',
+            'rol',
+            'sede',
         ]

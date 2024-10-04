@@ -18,7 +18,7 @@ class Command(BaseCommand):
         proyectos = []
         sedes_objs = []
         salas_objs = []
-        
+
         # Definir roles y verificar si ya existen
         rol_nombres = [
             'CEO', 'CTO', 'CFO', 'Líder de Equipo de Desarrollo',
@@ -36,6 +36,20 @@ class Command(BaseCommand):
             roles.append(rol)
 
         self.stdout.write(self.style.SUCCESS(f'Se han generado {len(roles)} roles.'))
+
+        # Generar sedes
+        sedes = ['Sede Principal', 'Sede Secundaria', 'Sede Internacional']
+
+        for nombre_sede in sedes:
+            sede = Sede.objects.create(
+                nombre=nombre_sede,
+                direccion=f'Calle {random.randint(1, 100)}',
+                ciudad='Ciudad ' + nombre_sede,
+                pais='País ' + nombre_sede
+            )
+            sedes_objs.append(sede)
+
+        self.stdout.write(self.style.SUCCESS(f'Se han generado {len(sedes_objs)} sedes.'))
 
         # Generar empleados
         for _ in range(100):  # Cambia este número para generar más o menos empleados
@@ -63,8 +77,9 @@ class Command(BaseCommand):
             with open(photo_path, 'wb') as f:
                 f.write(photo_response.content)
 
-            # Asignar un rol aleatorio a cada empleado
+            # Asignar un rol aleatorio y una sede aleatoria a cada empleado
             rol_aleatorio = random.choice(roles)
+            sede_aleatoria = random.choice(sedes_objs)  # Asignar una sede aleatoria
 
             empleado = Empleado(
                 nombre=nombre,
@@ -76,7 +91,8 @@ class Command(BaseCommand):
                 cumpleaños=fake.date_of_birth(minimum_age=18, maximum_age=65),
                 is_on_leave=fake.boolean(chance_of_getting_true=20),  # 20% de probabilidad de estar de baja
                 foto=f'empleados/{photo_filename}',  # Guardar el path relativo
-                rol=rol_aleatorio  # Asignar el rol aleatorio
+                rol=rol_aleatorio,  # Asignar el rol aleatorio
+                sede=sede_aleatoria  # Asignar la sede aleatoria
             )
 
             # Guardar el empleado en la base de datos
@@ -104,18 +120,6 @@ class Command(BaseCommand):
             proyecto.empleados.set(random.sample(list(Empleado.objects.all()), num_empleados))  # Asignar empleados al proyecto
 
         self.stdout.write(self.style.SUCCESS('Se han asignado empleados a los proyectos.'))
-
-        # Generar sedes
-        sedes = ['Sede Principal', 'Sede Secundaria', 'Sede Internacional']
-
-        for nombre_sede in sedes:
-            sede = Sede.objects.create(
-                nombre=nombre_sede,
-                direccion=f'Calle {random.randint(1, 100)}',
-                ciudad='Ciudad ' + nombre_sede,
-                pais='País ' + nombre_sede
-            )
-            sedes_objs.append(sede)
 
         # Generar salas de reuniones en cada sede
         nombres_salas = ['Sala 1', 'Sala 2', 'Sala 3']
@@ -156,3 +160,4 @@ class Command(BaseCommand):
             reserva.save()
 
         self.stdout.write(self.style.SUCCESS('Se han generado las reservas de las salas de reuniones correctamente.'))
+

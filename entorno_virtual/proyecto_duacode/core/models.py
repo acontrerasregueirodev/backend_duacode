@@ -44,10 +44,13 @@ class Empleado(models.Model):
     
     # Relación con Rol
     rol = models.ForeignKey(RolModel, on_delete=models.CASCADE, default=5)
+    # Relación con sede usando el nombre de la clase como cadena
+    sede = models.ForeignKey('sedes.Sede', on_delete=models.CASCADE, null=True, blank=True)  # Relación con Sede
 
     def __str__(self):
         # Así nos mostrará en el panel de administración con el formato: "Nombre Apellido Apellido - Rol"
         return f'{self.nombre} {self.apellido_1} {self.apellido_2} - {self.rol.nombre}'
+
 
     
     
