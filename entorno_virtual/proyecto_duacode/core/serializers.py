@@ -20,7 +20,7 @@ class EmpleadoSerializer(serializers.ModelSerializer):
             'email',
             'telefono',
             'puesto',
-            'fecha_contratación',
+            'fecha_contratacion',
             'cumpleaños',
             'is_on_leave',
             'foto',
