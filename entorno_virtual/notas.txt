@@ -1,15 +1,16 @@
 Como lanzar el servidor backend-django:
 
-   C:\Users\Propietario\Desktop\Duacode\Proyecto Duacode\Backend\proyecto_duacode> python manage.py runserver
+   C:\Users\Propietario\Desktop\Duacode\Proyecto Duacode\Backend\entorno_virtual\proyecto_duacode> python manage.py runserver
+
+ Creación de datos en la BBDD ejecutar:
+   Ejecuta el script generar_empleados.py entorno_virtual/proyecto_duacode
+    "python manage.py generar_empleados"
+
 
 Notas Panel de administración Django
  acceso : 127.0.0.1:8000/admin
- user y password : duacode/duacode_devteam
+ user y password : propietario/duacode
 
- Explicación realizado : https://chatgpt.com/c/66f12b33-883c-8012-9ebb-ebb3ee2594e9
 
- Creación de empleados ejecutar:
-   Ejecuta el script generar_empleados.py proyecto_duacode/core/management/commands/generar_empleados.py
-    "python manage.py generar_empleados"
-    "python manage.py genera_empleados_proyectos" -> Genera empleados y proyectos y los vincula
+  
     
