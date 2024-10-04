@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'proyectos',
     'subir_archivo',
     'sedes',
-    'email_sender',
+    'mapa',
 ]
 # Nuestra configuración de rest framework
  
@@ -104,7 +104,6 @@ WSGI_APPLICATION = 'proyecto_duacode.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -158,14 +157,4 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
-# CONFIGURACION EMAIL SENDER GMAIL
-# settings.py
-
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'adrian.contreras.rookie@gmail.com'  
-EMAIL_HOST_PASSWORD = 'Figura00+'  # Reemplaza con tu contraseña de Gmail
 
