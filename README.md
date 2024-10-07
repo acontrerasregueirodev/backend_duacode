@@ -24,16 +24,16 @@ Para actualizar el backend, sigue estos pasos:
 
 
 
-5. Como lanzar el servidor backend-django:
+5. **Como lanzar el servidor backend-django:**
 
    C:\Users\Propietario\Desktop\Duacode\Proyecto Duacode\Backend\entorno_virtual\proyecto_duacode> python manage.py runserver
 
-6. Creación de datos en la BBDD ejecutar:
+6. **Creación de datos en la BBDD ejecutar:**
    Ejecuta el script generar_empleados.py entorno_virtual/proyecto_duacode
     "python manage.py generar_empleados"
 
 
-7. Notas Panel de administración Django
+7. **Notas Panel de administración Django**
  acceso : 127.0.0.1:8000/admin
  user y password : propietario/duacode
 
