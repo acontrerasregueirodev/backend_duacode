@@ -65,6 +65,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Ajusta esta ruta si es necesario
 ##################################################################
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware', # Para poder acceder desde el front
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -73,7 +74,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # Nuestros middleware añadidos
-    'corsheaders.middleware.CorsMiddleware', # Para poder acceder desde el front
 ]
 #Configuración cors para acceder desde el frontend
 CORS_ALLOW_ALL_ORIGINS = True

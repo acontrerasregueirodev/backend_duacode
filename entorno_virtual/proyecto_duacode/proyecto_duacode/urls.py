@@ -28,7 +28,6 @@ urlpatterns = [
     path('api/sedes/',include('sedes.urls')),
     path('mapa/',include('mapa.urls')),
 
-
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
