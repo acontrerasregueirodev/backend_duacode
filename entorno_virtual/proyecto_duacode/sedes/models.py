@@ -17,8 +17,9 @@ class SalaReuniones(models.Model):
     nombre = models.CharField(max_length=100)
     capacidad = models.IntegerField()
     sede = models.ForeignKey(Sede, on_delete=models.CASCADE, related_name='salas')
+    imagen = models.ImageField(upload_to='salas_reuniones/', null=True, blank=True)  # Nuevo campo para la imagen
 
-    def str(self):
+    def __str__(self):
         return f'{self.nombre} en {self.sede.nombre}'
 
     @property

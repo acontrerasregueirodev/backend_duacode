@@ -7,6 +7,7 @@ class SedeViewSet(viewsets.ModelViewSet):
     queryset = Sede.objects.all()
     serializer_class = SedeSerializer
 
+
 class SalaReunionesViewSet(viewsets.ModelViewSet):
     queryset = SalaReuniones.objects.all()
     serializer_class = SalaReunionesSerializer
@@ -17,6 +18,15 @@ class SalaReunionesViewSet(viewsets.ModelViewSet):
         if sede_id:
             queryset = queryset.filter(sede_id=sede_id)
         return queryset
+
+    def list(self, request, *args, **kwargs):
+        """
+        Sobrescribe el método list para incluir las imágenes de las salas.
+        """
+        queryset = self.get_queryset()
+        serializer = SalaReunionesSerializer(queryset, many=True, context={'request': request})
+        return Response(serializer.data)
+
 
 class ReservaSalaViewSet(viewsets.ModelViewSet):
     queryset = ReservaSala.objects.all()
@@ -52,3 +62,4 @@ class ReservaSalaViewSet(viewsets.ModelViewSet):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
