@@ -36,8 +36,8 @@ Para actualizar el backend, sigue estos pasos:
 
 7. **Notas Panel de administración Django**
 
-  acceso : 127.0.0.1:8000/admin
-  user y password : propietario/duacode
+   acceso : 127.0.0.1:8000/admin
+   user y password : propietario/duacode
 
 
   
