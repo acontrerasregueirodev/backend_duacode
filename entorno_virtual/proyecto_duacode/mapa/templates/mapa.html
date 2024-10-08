@@ -1,38 +1,53 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mapa de OpenStreetMap</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mapas de OpenStreetMap</title>
     <style>
-        #map {
-            height: 400px;
-            width: 100%;
-        }
+      /* Estilo para los contenedores de los mapas */
+      .map {
+        height: 400px; /* Altura de cada mapa */
+        width: 30%; /* Ancho de cada mapa */
+        float: left; /* Colocar mapas uno al lado del otro */
+        margin: 10px; /* Espaciado entre mapas */
+      }
     </style>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-</head>
-<body>
+  </head>
+  <body>
+    <div class="map" id="map1"></div>
+    <div class="map" id="map2"></div>
+    <div class="map" id="map3"></div>
 
-<div id="map"></div>
-
-<script>
-    // Crear el mapa
-    var map = L.map('map').setView([43.3623, -8.4115], 13); // Coordenadas de La Coruña
-
-    // Capa de OpenStreetMap
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    <script>
+      // Crear el primer mapa
+      var map1 = L.map("map1").setView([43.3623, -8.4115], 13); // Coordenadas de La Coruña
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 19,
-        attribution: '© OpenStreetMap'
-    }).addTo(map);
+        attribution: "© OpenStreetMap",
+      }).addTo(map1);
+      var marker1 = L.marker([43.3623, -8.4115]).addTo(map1);
+      marker1.bindPopup("<b>Avenida del Pasaje 2</b>").openPopup();
 
-    // Añadir un marcador
-    var marker = L.marker([43.3623, -8.4115]).addTo(map);
-    marker.bindPopup('<b>Avenida del Pasaje 2</b>').openPopup();
-</script>
+      // Crear el segundo mapa
+      var map2 = L.map("map2").setView([43.3623, -8.4234], 13); // Coordenadas diferentes para el segundo mapa
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: "© OpenStreetMap",
+      }).addTo(map2);
+      var marker2 = L.marker([43.3623, -8.4234]).addTo(map2);
+      marker2.bindPopup("<b>Plaza de Lugo</b>").openPopup();
 
-</body>
+      // Crear el tercer mapa
+      var map3 = L.map("map3").setView([43.366, -8.4113], 13); // Coordenadas diferentes para el tercer mapa
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: "© OpenStreetMap",
+      }).addTo(map3);
+      var marker3 = L.marker([43.366, -8.4113]).addTo(map3);
+      marker3.bindPopup("<b>La Torre de Hércules</b>").openPopup();
+    </script>
+  </body>
 </html>
-
-
