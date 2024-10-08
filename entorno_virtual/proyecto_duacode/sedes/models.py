@@ -1,5 +1,4 @@
 from django.db import models
-from core.models import Empleado
 from django.utils import timezone  # Para obtener la fecha/hora actual
 
 
@@ -9,7 +8,7 @@ class Sede(models.Model):
     ciudad = models.CharField(max_length=100)
     pais = models.CharField(max_length=100)
 
-    def str(self):
+    def __str__(self):
         return self.nombre
 
 
@@ -17,7 +16,7 @@ class SalaReuniones(models.Model):
     nombre = models.CharField(max_length=100)
     capacidad = models.IntegerField()
     sede = models.ForeignKey(Sede, on_delete=models.CASCADE, related_name='salas')
-    imagen = models.ImageField(upload_to='salas_reuniones/', null=True, blank=True)  # Nuevo campo para la imagen
+    imagen_url = models.URLField(max_length=200, null=True, blank=True)
 
     def __str__(self):
         return f'{self.nombre} en {self.sede.nombre}'
@@ -28,7 +27,8 @@ class SalaReuniones(models.Model):
         Determina si la sala está ocupada en función de las reservas actuales.
         """
         ahora = timezone.now()
-        return self.reservas.filter(fecha_iniciolte=ahora, fecha_fingte=ahora).exists()
+        # Uso correcto de los filtros __lte (menor o igual) y __gte (mayor o igual)
+        return self.reservas.filter(fecha_inicio__lte=ahora, fecha_fin__gte=ahora).exists()
 
     class Meta:
         db_table = 'salas_reuniones'
@@ -36,12 +36,12 @@ class SalaReuniones(models.Model):
 
 class ReservaSala(models.Model):
     sala = models.ForeignKey(SalaReuniones, on_delete=models.CASCADE, related_name='reservas')
-    reservado_por = models.ForeignKey(Empleado, on_delete=models.CASCADE)
+    reservado_por = models.ForeignKey('core.Empleado', on_delete=models.CASCADE)
     fecha_inicio = models.DateTimeField()
     fecha_fin = models.DateTimeField()
-    empleados_asistentes = models.ManyToManyField(Empleado, related_name='reservas_asistentes', blank=True)
+    empleados_asistentes = models.ManyToManyField('core.Empleado', related_name='reservas_asistentes', blank=True)
 
-    def str(self):
+    def __str__(self):
         return f'Reserva de {self.sala.nombre} por {self.reservado_por}'
 
     class Meta:

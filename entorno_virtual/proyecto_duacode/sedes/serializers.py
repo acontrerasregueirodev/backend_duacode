@@ -1,41 +1,38 @@
 from rest_framework import serializers
 from .models import Sede, SalaReuniones, ReservaSala
+from core.models import Empleado  # Asegúrate de tener la importación correcta de 'Empleado'
+
 
 class SedeSerializer(serializers.ModelSerializer):
+    # Incluir las salas de reuniones relacionadas con la sede
+    salas = serializers.StringRelatedField(many=True, read_only=True)
+
     class Meta:
         model = Sede
-        fields = '__all__'
+        fields = ['id', 'nombre', 'direccion', 'ciudad', 'pais', 'salas']
 
 
 class SalaReunionesSerializer(serializers.ModelSerializer):
+    # Mostrar los detalles de la sede relacionada
     sede = SedeSerializer(read_only=True)
-    sede_id = serializers.PrimaryKeyRelatedField(
-        queryset=Sede.objects.all(), source='sede', write_only=True
-    )
-    imagen_url = serializers.SerializerMethodField()  # Nuevo campo para la URL de la imagen
+    # Incluir las reservas de la sala
+    reservas = serializers.StringRelatedField(many=True, read_only=True)
+    # Mostrar si la sala está ocupada usando la propiedad 'is_ocupada'
+    is_ocupada = serializers.ReadOnlyField()
 
     class Meta:
         model = SalaReuniones
-        fields = ['id', 'nombre', 'capacidad', 'sede', 'sede_id', 'imagen_url']  # Se incluye 'imagen_url'
-
-    def get_imagen_url(self, obj):
-        """
-        Si la sala tiene una imagen, devuelve la URL completa de la imagen.
-        Si no tiene, devuelve None.
-        """
-        request = self.context.get('request')
-        if obj.imagen:
-            return request.build_absolute_uri(obj.imagen.url)  # Construye la URL completa
-        return None
+        fields = ['id', 'nombre', 'capacidad', 'sede', 'imagen_url', 'reservas', 'is_ocupada']
 
 
 class ReservaSalaSerializer(serializers.ModelSerializer):
+    # Mostrar los detalles de la sala reservada
     sala = SalaReunionesSerializer(read_only=True)
-    sala_id = serializers.PrimaryKeyRelatedField(
-        queryset=SalaReuniones.objects.all(), source='sala', write_only=True
-    )
+    # Mostrar el nombre del empleado que reservó la sala
+    reservado_por = serializers.StringRelatedField(read_only=True)
+    # Mostrar los asistentes a la reunión
+    empleados_asistentes = serializers.StringRelatedField(many=True, read_only=True)
 
     class Meta:
         model = ReservaSala
-        fields = ['id', 'sala', 'sala_id', 'fecha_inicio', 'fecha_fin', 'reservado_por']
-
+        fields = ['id', 'sala', 'reservado_por', 'fecha_inicio', 'fecha_fin', 'empleados_asistentes']
