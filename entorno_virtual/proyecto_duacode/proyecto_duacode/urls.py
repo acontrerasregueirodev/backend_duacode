@@ -27,6 +27,8 @@ urlpatterns = [
     path('upload/', include('subir_archivo.urls')),  # Asegúrate de que la ruta sea correcta
     path('api/sedes/',include('sedes.urls')),
     path('mapa/',include('mapa.urls')),
+    path('contacto/', include('contacto.urls')),
+    
 
 ]
 if settings.DEBUG:

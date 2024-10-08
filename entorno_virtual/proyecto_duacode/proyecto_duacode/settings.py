@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'subir_archivo',
     'sedes',
     'mapa',
+    'contacto',
 ]
 # Nuestra configuración de rest framework
  
@@ -157,4 +158,12 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# settings.py
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.pythonanywhere.com'  # Servidor SMTP de PythonAnywhere
+EMAIL_PORT = 587  # Puerto
+EMAIL_USE_TLS = True  # Usar TLS
+EMAIL_HOST_USER = 'belami@pythonanywhere.com'  # Reemplaza con tu usuario de PythonAnywhere
+EMAIL_HOST_PASSWORD = 'Figura00+'  # Tu contraseña de PythonAnywhere
+DEFAULT_FROM_EMAIL = 'contacto@pythonanywhere.com'  # Cambia esto según tu necesidad

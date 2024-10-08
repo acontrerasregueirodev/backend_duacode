@@ -1,0 +1,15 @@
+<!-- contacto/templates/contacto/contacto.html -->
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Formulario de Contacto</title>
+  </head>
+  <body>
+    <h1>Contacto</h1>
+    <form method="post">
+      {% csrf_token %} {{ form.as_p }}
+      <button type="submit">Enviar</button>
+    </form>
+  </body>
+</html>
