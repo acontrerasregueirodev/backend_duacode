@@ -1,13 +1,14 @@
 import os
-import requests
 import random
+import requests  # <-- Add this line to import the requests library
 from django.core.management.base import BaseCommand
 from faker import Faker
-from core.models import Empleado, RolModel  # Importar RolModel
+from core.models import Empleado, RolModel
 from proyectos.models import Proyecto
 from sedes.models import Sede, SalaReuniones, ReservaSala
 from django.utils import timezone
 from datetime import timedelta
+from django.conf import settings  # <-- Import settings to access MEDIA_URL
 
 class Command(BaseCommand):
     help = 'Genera datos ficticios para empleados, proyectos, sedes, salas y reuniones'
@@ -18,6 +19,10 @@ class Command(BaseCommand):
         proyectos = []
         sedes_objs = []
         salas_objs = []
+
+        # Path to the folder with room images
+        imagenes_path = os.path.join(settings.MEDIA_ROOT, 'salas_reuniones')
+        imagenes = [f for f in os.listdir(imagenes_path) if f.endswith('.jpg')]
 
         # Definir roles y verificar si ya existen
         rol_nombres = [
@@ -52,11 +57,10 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(f'Se han generado {len(sedes_objs)} sedes.'))
 
         # Generar empleados
-        for _ in range(100):  # Cambia este número para generar más o menos empleados
+        for _ in range(100):
             response = requests.get('https://randomuser.me/api/')
             data = response.json()
 
-            # Obtener el género y la URL de la foto
             gender = data['results'][0]['gender']
             if gender == 'male':
                 nombre = fake.first_name_male()
@@ -66,20 +70,16 @@ class Command(BaseCommand):
             photo_url = data['results'][0]['picture']['medium']
             photo_response = requests.get(photo_url)
 
-            # Generar los nombres para el archivo de imagen
             apellido_1 = fake.last_name()
             apellido_2 = fake.last_name()
-
-            # Guardar imagen localmente con el formato nombre_apellido1_apellido_2.jpg
             photo_filename = f'{nombre}_{apellido_1}_{apellido_2}.jpg'
-            photo_path = os.path.join('media', 'empleados', photo_filename)
+            photo_path = os.path.join(settings.MEDIA_ROOT, 'empleados', photo_filename)
 
             with open(photo_path, 'wb') as f:
                 f.write(photo_response.content)
 
-            # Asignar un rol aleatorio y una sede aleatoria a cada empleado
             rol_aleatorio = random.choice(roles)
-            sede_aleatoria = random.choice(sedes_objs)  # Asignar una sede aleatoria
+            sede_aleatoria = random.choice(sedes_objs)
 
             empleado = Empleado(
                 nombre=nombre,
@@ -89,19 +89,17 @@ class Command(BaseCommand):
                 telefono=fake.phone_number(),
                 fecha_contratacion=fake.date_between(start_date='-5y', end_date='today'),
                 cumpleaños=fake.date_of_birth(minimum_age=18, maximum_age=65),
-                is_on_leave=fake.boolean(chance_of_getting_true=20),  # 20% de probabilidad de estar de baja
-                foto=f'empleados/{photo_filename}',  # Guardar el path relativo
-                rol=rol_aleatorio,  # Asignar el rol aleatorio
-                sede=sede_aleatoria  # Asignar la sede aleatoria
+                is_on_leave=fake.boolean(chance_of_getting_true=20),
+                foto=f'empleados/{photo_filename}',
+                rol=rol_aleatorio,
+                sede=sede_aleatoria
             )
-
-            # Guardar el empleado en la base de datos
             empleado.save()
 
         self.stdout.write(self.style.SUCCESS(f'Se han generado {Empleado.objects.count()} empleados.'))
 
         # Generar proyectos
-        for _ in range(10):  # Cambia este número para generar más o menos proyectos
+        for _ in range(10):
             proyecto = Proyecto(
                 nombre=fake.company(),
                 descripcion=fake.paragraph(),
@@ -110,54 +108,51 @@ class Command(BaseCommand):
             )
             proyectos.append(proyecto)
 
-        # Guardar todos los proyectos en la base de datos
         Proyecto.objects.bulk_create(proyectos)
         self.stdout.write(self.style.SUCCESS(f'Se han generado {len(proyectos)} proyectos.'))
 
-        # Asignar empleados a proyectos (ManyToMany)
+        # Asignar empleados a proyectos
         for proyecto in proyectos:
-            num_empleados = random.randint(1, 10)  # Elegir un número aleatorio de empleados
-            proyecto.empleados.set(random.sample(list(Empleado.objects.all()), num_empleados))  # Asignar empleados al proyecto
+            num_empleados = random.randint(1, 10)
+            proyecto.empleados.set(random.sample(list(Empleado.objects.all()), num_empleados))
 
         self.stdout.write(self.style.SUCCESS('Se han asignado empleados a los proyectos.'))
 
-        # Generar salas de reuniones en cada sede
+        # Generar salas de reuniones y asignarles imágenes
         nombres_salas = ['Sala 1', 'Sala 2', 'Sala 3']
 
         for sede in sedes_objs:
             for nombre_sala in nombres_salas:
+                # Asignar una imagen aleatoria de la carpeta y crear la URL
+                imagen_aleatoria = random.choice(imagenes)
+                imagen_url = f"{settings.MEDIA_URL}salas_reuniones/{imagen_aleatoria}"
+
                 sala = SalaReuniones.objects.create(
                     nombre=nombre_sala,
                     capacidad=random.randint(5, 20),
-                    sede=sede
+                    sede=sede,
+                    imagen_url=imagen_url  # Asignar la URL completa
                 )
                 salas_objs.append(sala)
 
-        self.stdout.write(self.style.SUCCESS(f'Se han generado {len(salas_objs)} salas de reuniones.'))
+        self.stdout.write(self.style.SUCCESS(f'Se han generado {len(salas_objs)} salas de reuniones con imágenes.'))
 
-        # Generar reservas de salas vinculadas a empleados
-        for _ in range(10):  # Generar 10 reuniones aleatorias
+        # Generar reservas de salas
+        for _ in range(10):
             sala_aleatoria = random.choice(salas_objs)
             fecha_inicio = timezone.now() + timedelta(days=random.randint(1, 30), hours=random.randint(8, 18))
             fecha_fin = fecha_inicio + timedelta(hours=2)
 
-            # Seleccionar empleados aleatorios para asistir a la reunión
             asistentes = random.sample(list(Empleado.objects.all()), random.randint(2, 5))
-
-            # Seleccionar un empleado aleatorio para hacer la reserva
             empleado_reservador = random.choice(Empleado.objects.all())
 
-            # Crear la reserva
             reserva = ReservaSala.objects.create(
                 sala=sala_aleatoria,
                 fecha_inicio=fecha_inicio,
                 fecha_fin=fecha_fin,
-                reservado_por=empleado_reservador  # Guardar el empleado que hace la reserva
+                reservado_por=empleado_reservador
             )
-
-            # Relacionar empleados con la reunión
-            reserva.empleados_asistentes.set(asistentes)  # Relación ManyToMany
+            reserva.empleados_asistentes.set(asistentes)
             reserva.save()
 
         self.stdout.write(self.style.SUCCESS('Se han generado las reservas de las salas de reuniones correctamente.'))
-
