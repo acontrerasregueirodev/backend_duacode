@@ -15,8 +15,13 @@ __pycache__/
 *.sqlite3
 
 # Archivos de medios
-/media/codigo_qr/
-/media/empleados/
+# Ignorar todos los archivos en /media/empleados
+media/empleados/*
+!media/empleados/.gitkeep
+
+# Ignorar todos los archivos en /media/codigo_qr
+media/codigo_qr/*
+!media/codigo_qr/.gitkeep
 
 # Archivos estáticos
 /static/
