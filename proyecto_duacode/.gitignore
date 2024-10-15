@@ -1,0 +1,27 @@
+# Entorno virtual
+env/
+venv/
+entorno_virtual/
+
+# Archivos de compilación
+*.pyc
+__pycache__/
+
+# Archivos de configuración de IDEs
+.vscode/
+.idea/
+
+# Archivos de base de datos
+*.sqlite3
+
+# Archivos de medios
+/media/
+
+# Archivos estáticos
+/static/
+
+# Archivos de logs
+*.log
+
+# Archivos de seguridad
+*.env
