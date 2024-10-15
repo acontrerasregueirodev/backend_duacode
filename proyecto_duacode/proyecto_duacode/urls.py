@@ -29,6 +29,8 @@ urlpatterns = [
     path('mapa/',include('mapa.urls')),
     path('contacto/', include('contacto.urls')),    
     path('codigo_qr/', include('codigo_qr.urls')),
+    path('auth/', include('login.urls')),  # Include login app URLs
+
 
     
 

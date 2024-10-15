@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'mapa',
     'contacto',
     'codigo_qr',
+    'login',
 
 ]
 # Nuestra configuración de rest framework
