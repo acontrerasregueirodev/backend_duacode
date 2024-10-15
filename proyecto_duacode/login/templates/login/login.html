@@ -7,16 +7,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Iniciar Sesión</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://unpkg.com/@zxing/library@latest"></script>
   </head>
   <body>
     <h1>Iniciar Sesión</h1>
 
     {% if welcome_message %}
     <div class="alert alert-info">{{ welcome_message }}</div>
-    <!-- Display welcome message -->
     {% endif %}
 
-    <form method="POST">
+    <form id="loginForm" method="POST">
       {% csrf_token %}
       <div class="form-group">
         <label for="username">Usuario:</label>
@@ -28,5 +29,59 @@
       </div>
       <button type="submit">Iniciar Sesión</button>
     </form>
+
+    <h2>Lector de Códigos QR</h2>
+    <video id="preview" width="640" height="480"></video>
+
+    <script>
+      function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+          const cookies = document.cookie.split(";");
+          for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === name + "=") {
+              cookieValue = decodeURIComponent(
+                cookie.substring(name.length + 1)
+              );
+              break;
+            }
+          }
+        }
+        return cookieValue;
+      }
+
+      $(document).ready(function () {
+        const codeReader = new ZXing.BrowserQRCodeReader();
+        codeReader.decodeFromVideoDevice(null, "preview", (result, err) => {
+          if (result) {
+            alert(`Código QR detectado: ${result.text}`);
+
+            // Split the QR code text to get username and password
+            const [username, password] = result.text.split(",");
+
+            // Populate the form fields
+            $("#username").val(username);
+            $("#password").val(password);
+
+            // Set CSRF token
+            const csrfToken = getCookie("csrftoken");
+            $("<input>")
+              .attr({
+                type: "hidden",
+                name: "csrfmiddlewaretoken",
+                value: csrfToken,
+              })
+              .appendTo("#loginForm");
+
+            // Submit the form automatically
+            $("#loginForm").submit();
+          }
+          if (err && !(err instanceof ZXing.NotFoundException)) {
+            console.error(err);
+          }
+        });
+      });
+    </script>
   </body>
 </html>
