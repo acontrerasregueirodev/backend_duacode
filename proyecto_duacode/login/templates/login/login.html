@@ -56,7 +56,7 @@
         codeReader.decodeFromVideoDevice(null, "preview", (result, err) => {
           if (result) {
             alert(`Código QR detectado: ${result.text}`);
-
+            console.log("Bienvenidop");
             // Split the QR code text to get username and password
             const [username, password] = result.text.split(",");
 
