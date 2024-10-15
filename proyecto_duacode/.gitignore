@@ -15,7 +15,8 @@ __pycache__/
 *.sqlite3
 
 # Archivos de medios
-/media/
+/media/codigo_qr/
+/media/empleados/
 
 # Archivos estáticos
 /static/
