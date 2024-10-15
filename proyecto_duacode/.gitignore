@@ -11,8 +11,7 @@ __pycache__/
 .vscode/
 .idea/
 
-# Archivos de base de datos
-*.sqlite3
+
 
 # Archivos de medios
 # Ignorar todos los archivos en /media/empleados
@@ -31,3 +30,6 @@ media/codigo_qr/*
 
 # Archivos de seguridad
 *.env
+
+# Archivos de base de datos
+*.sqlite3
