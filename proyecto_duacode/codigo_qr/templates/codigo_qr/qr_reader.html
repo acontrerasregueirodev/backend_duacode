@@ -1,0 +1,28 @@
+<!-- codigo_qr/templates/codigo_qr/qr_reader.html -->
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lector de Códigos QR</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://unpkg.com/@zxing/library@latest"></script>
+  </head>
+  <body>
+    <h1>Lector de Códigos QR</h1>
+    <video id="preview" width="640" height="480"></video>
+    <script>
+      $(document).ready(function () {
+        const codeReader = new ZXing.BrowserQRCodeReader();
+        codeReader.decodeFromVideoDevice(null, "preview", (result, err) => {
+          if (result) {
+            alert(`Código QR detectado: ${result.text}`);
+          }
+          if (err && !(err instanceof ZXing.NotFoundException)) {
+            console.error(err);
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
