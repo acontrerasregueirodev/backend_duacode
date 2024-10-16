@@ -1,4 +1,6 @@
 import os
+from django.utils import timezone
+from datetime import timedelta
 import random
 import requests
 import qrcode  # Importar la biblioteca para generar códigos QR
@@ -7,8 +9,6 @@ from faker import Faker
 from core.models import Empleado, RolModel
 from proyectos.models import Proyecto
 from sedes.models import Sede, SalaReuniones, ReservaSala
-from django.utils import timezone
-from datetime import timedelta
 from django.conf import settings
 from django.contrib.auth.models import User  # Importa el modelo User
 
@@ -59,7 +59,7 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(f'Se han generado {len(sedes_objs)} sedes.'))
 
         # Generar empleados
-        for _ in range(100):
+        for _ in range(5):
             response = requests.get('https://randomuser.me/api/')
             data = response.json()
 
@@ -102,13 +102,7 @@ class Command(BaseCommand):
                 sede=sede_aleatoria
             )
             empleado.save()
-
-            # # Generar código QR para el empleado
-            # qr_data = f"Empleado: {nombre} {apellido_1} {apellido_2}\nEmail: {user.email}"
-            # qr_img = qrcode.make(qr_data)
-            # qr_filename = f'codigo_qr/{nombre}_{apellido_1}_{apellido_2}.png'
-            # qr_path = os.path.join(settings.MEDIA_ROOT, qr_filename)
-            # qr_img.save(qr_path)
+        self.stdout.write(self.style.SUCCESS(f'Empleado creado: {nombre} {apellido_1} {apellido_2}'))
 
         self.stdout.write(self.style.SUCCESS(f'Se han generado {Empleado.objects.count()} empleados.'))
 

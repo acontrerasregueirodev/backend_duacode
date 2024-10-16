@@ -30,7 +30,7 @@ class RolModel(models.Model):
         return self.nombre
 
 
-# Modelo para los empleados
+
 # Modelo para los empleados
 class Empleado(models.Model):
     # Relación con el modelo User

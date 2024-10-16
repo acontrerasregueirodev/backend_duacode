@@ -15,8 +15,7 @@
 
     {% if welcome_message %}
     <div class="alert alert-info">{{ welcome_message }}</div>
-    {% endif %}
-
+    {% endif %} {% comment %} FORMULARIO DE USER Y password {% endcomment %}
     <form id="loginForm" method="POST">
       {% csrf_token %}
       <div class="form-group">
@@ -34,6 +33,7 @@
     <video id="preview" width="640" height="480"></video>
 
     <script>
+      // Recogemos el valor de la cookie de sesion y lo decodificamos
       function getCookie(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== "") {
@@ -52,19 +52,22 @@
       }
 
       $(document).ready(function () {
+        // Nos crea la vista de la webcam
         const codeReader = new ZXing.BrowserQRCodeReader();
+        // Descodificamos el contenido del qr si se lee
         codeReader.decodeFromVideoDevice(null, "preview", (result, err) => {
           if (result) {
-            alert(`Código QR detectado: ${result.text}`);
-            console.log("Bienvenidop");
-            // Split the QR code text to get username and password
-            const [username, password] = result.text.split(",");
+            //Pasamos la info a formato JSON
+            const employeeData = JSON.parse(result.text);
 
-            // Populate the form fields
+            // Crear el username y la password en el formato deseado
+            const username = `${employeeData.nombre}.${employeeData.apellido_1}`;
+            const password = `${employeeData.contraseña}`;
+            // Asignamos al formulario los valores de las variables
             $("#username").val(username);
             $("#password").val(password);
 
-            // Set CSRF token
+            // Añadimos el token de sesion
             const csrfToken = getCookie("csrftoken");
             $("<input>")
               .attr({
@@ -74,9 +77,10 @@
               })
               .appendTo("#loginForm");
 
-            // Submit the form automatically
+            // Hacemos submit automático
             $("#loginForm").submit();
           }
+          // Si hay un error lo mostramos por consola
           if (err && !(err instanceof ZXing.NotFoundException)) {
             console.error(err);
           }
