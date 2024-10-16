@@ -10,7 +10,8 @@ __pycache__/
 # Archivos de configuración de IDEs
 .vscode/
 .idea/
-
+# Ignorar todas las carpetas migrations en cualquier nivel
+*/migrations/
 
 
 # Archivos de medios
