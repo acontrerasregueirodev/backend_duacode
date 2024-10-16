@@ -1,7 +1,7 @@
 # Entorno virtual
 env/
 venv/
-entorno_virtual/
+/entorno_virtual/
 
 # Archivos de compilación
 *.pyc
