@@ -59,7 +59,7 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(f'Se han generado {len(sedes_objs)} sedes.'))
 
         # Generar empleados
-        for _ in range(5):
+        for _ in range(30):
             response = requests.get('https://randomuser.me/api/')
             data = response.json()
 

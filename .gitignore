@@ -1,0 +1,36 @@
+# Entorno virtual
+env/
+venv/
+/entorno_virtual/
+
+# Archivos de compilación
+*.pyc
+__pycache__/
+
+# Archivos de configuración de IDEs
+.vscode/
+.idea/
+# Ignorar todas las carpetas migrations en cualquier nivel
+*/migrations/
+
+
+# Archivos de medios
+# Ignorar todos los archivos en /media/empleados
+media/empleados/*
+!media/empleados/.gitkeep
+
+# Ignorar todos los archivos en /media/codigo_qr
+media/codigo_qr/*
+!media/codigo_qr/.gitkeep
+
+# Archivos estáticos
+/static/
+
+# Archivos de logs
+*.log
+
+# Archivos de seguridad
+*.env
+
+# Archivos de base de datos
+*.sqlite3

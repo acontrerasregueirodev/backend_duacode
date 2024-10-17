@@ -5,7 +5,7 @@ Para actualizar el backend, sigue estos pasos:
 1. **Ejecutar comandos de gestión**:
    - Desde `\proyecto_duacode`, ejecuta los siguientes comandos:
 
-   ```bash
+   pip install -r requirements.txt
    python manage.py makemigrations      # Esto prepara la BBDD
    python manage.py migrate             # Con esto la creamos
    python manage.py createsuperuser     # Crear admin de BBDD (poder tocar la BBDD desde localhost:8000/admin)
@@ -15,7 +15,7 @@ Para actualizar el backend, sigue estos pasos:
 
 2. **Como lanzar el servidor backend-django:**
 
-   C:\Users\Propietario\Desktop\Duacode\Proyecto Duacode\Backend\proyecto_duacode> python manage.py runserver
+    En el directorio : proyecto_duacode> python manage.py runserver
 
 3. **Creación de datos en la BBDD ejecutar:**
 
