@@ -1,12 +1,19 @@
 import logging
 from rest_framework import viewsets
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from django.http import HttpResponse
+from django.contrib.auth.decorators import login_required
 from .models import Empleado
 from .serializers import EmpleadoSerializer, EmpleadoUpdateSerializer
+from django.contrib.auth.decorators import login_required
 
 logger = logging.getLogger(__name__)
 
+
+@login_required
+def test_view(request):
+    #Al conectarme a http://localhost:8000/api/empleados/test/ muestra una ruta 
+    return HttpResponse("Esto es una prueba.")
 class EmpleadoViewset(viewsets.ModelViewSet):
     queryset = Empleado.objects.all()
     
@@ -38,11 +45,4 @@ class EmpleadoViewset(viewsets.ModelViewSet):
         # Retorna la respuesta con el objeto actualizado
         return Response(serializer.data)
 
-# Nueva vista para el panel de empleados, protegida por IsAuthenticated
-class PanelEmpleadosView(viewsets.ViewSet):
-    permission_classes = [IsAuthenticated]  # Solo permite acceso a usuarios autenticados
-    
-    def list(self, request):
-        empleados = Empleado.objects.all()  # Lógica para obtener los empleados
-        serializer = EmpleadoSerializer(empleados, many=True)  # Serializa los datos
-        return Response(serializer.data)  # Retorna los empleados
+
