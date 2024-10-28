@@ -34,3 +34,8 @@ class EmpleadoSerializer(serializers.ModelSerializer):
             'sede',
         ]
 
+
+class EmpleadoUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Empleado
+        fields = ['nombre', 'apellido_1', 'apellido_2', 'email', 'telefono']
