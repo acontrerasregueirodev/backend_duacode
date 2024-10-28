@@ -1,21 +1,22 @@
 import os
 from pathlib import Path
 
+# Base directory for the project
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Secret key (ensure to keep this safe in production)
 SECRET_KEY = 'django-insecure-fg9l&4x*jdh+1ct_*g4$1r1q9i-gi)@gs998x8olw537p$az7o'
 
 DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
-# Configuración CSRF y CORS
+# CSRF and CORS settings
 CSRF_TRUSTED_ORIGINS = ['http://localhost:3000']
 CORS_ALLOWED_ORIGINS = ['http://localhost:3000']
-
 CORS_ALLOW_CREDENTIALS = True
 
-
+# Installed apps
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -34,10 +35,12 @@ INSTALLED_APPS = [
     'codigo_qr',
     'login',
 ]
+
 LOGOUT_REDIRECT_URL = '/'
 
+# Middleware
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',  # Debe estar al principio
+    'corsheaders.middleware.CorsMiddleware',  # Should be at the top
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -47,19 +50,25 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# REST framework settings
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.AllowAny'],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',  # Require authentication
+    ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
     ],
 }
 
+# Media files settings
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+# URL configurations
 ROOT_URLCONF = 'proyecto_duacode.urls'
 
+# Templates settings
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -78,6 +87,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'proyecto_duacode.wsgi.application'
 
+# Database configuration
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -85,6 +95,7 @@ DATABASES = {
     }
 }
 
+# Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -101,6 +112,7 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Uncomment the email configuration if needed
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 # EMAIL_HOST = 'smtp.pythonanywhere.com'
 # EMAIL_PORT = 587

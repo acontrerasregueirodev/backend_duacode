@@ -27,7 +27,8 @@ class RolModel(models.Model):
     nombre = models.CharField(max_length=50, choices=ROL_CHOICES)
 
     def __str__(self):
-        return self.nombre
+        # Se asegura de devolver el valor legible para el nombre
+        return dict(self.ROL_CHOICES).get(self.nombre, self.nombre)
 
 
 

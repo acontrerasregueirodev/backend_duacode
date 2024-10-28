@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import Empleado, RolModel
-from proyectos.models import Proyecto 
+from proyectos.models import Proyecto
 
 class RolModelSerializer(serializers.ModelSerializer):
     class Meta:
@@ -13,7 +13,7 @@ class ProyectoSerializer(serializers.ModelSerializer):
         fields = ['id', 'nombre', 'descripcion', 'fecha_inicio', 'fecha_fin']
 
 class EmpleadoSerializer(serializers.ModelSerializer):
-    proyectos = ProyectoSerializer(many=True, read_only=True)  # Relación opcional
+    proyectos = ProyectoSerializer(many=True, read_only=True)  # Relación opcional, solo lectura
     rol = RolModelSerializer()  # Usar el serializer anidado para el campo rol
 
     class Meta:
@@ -34,6 +34,20 @@ class EmpleadoSerializer(serializers.ModelSerializer):
             'sede',
         ]
 
+    def create(self, validated_data):
+        # Extraer los datos del rol
+        rol_data = validated_data.pop('rol', None)
+
+        # Crear el empleado
+        empleado = Empleado.objects.create(**validated_data)
+
+        # Si hay datos de rol, crea o asocia el rol
+        if rol_data:
+            rol, created = RolModel.objects.get_or_create(**rol_data)
+            empleado.rol = rol
+            empleado.save()
+
+        return empleado
 
 class EmpleadoUpdateSerializer(serializers.ModelSerializer):
     class Meta:
