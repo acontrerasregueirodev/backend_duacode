@@ -1,14 +1,25 @@
 import logging
 from rest_framework import viewsets
 from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from .models import Empleado
 from .serializers import EmpleadoSerializer, EmpleadoUpdateSerializer
-from rest_framework import status
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.viewsets import ModelViewSet
 
 logger = logging.getLogger(__name__)
+
+class BasePermisos(ModelViewSet):
+    def get_permissions(self):
+        # Requiere autenticación para crear, actualizar y eliminar
+        if self.action in ['create', 'update', 'destroy']:
+            return [IsAuthenticated()]
+        # Permitir acceso a cualquier usuario para listar o ver detalles
+        return [AllowAny()]
+
+
 
 def test_view(request):
     # Al conectarme a http://localhost:8000/api/empleados/test/ muestra una ruta 
@@ -18,10 +29,11 @@ class EmpleadoViewset(viewsets.ModelViewSet):
     queryset = Empleado.objects.all()
 
     def get_permissions(self):
-        # Solo requerir autenticación para la acción de creación
-        if self.action == 'create':
-            return [IsAuthenticated()]  # Requiere autenticación
-        return [AllowAny()]  # Permitir acceso a cualquier usuario para otras acciones
+        # Require authentication for create, update, and delete actions
+        if self.action in ['create', 'update', 'destroy']:
+            return [IsAuthenticated()]  # Requires authentication for these actions
+        # Allow access to anyone for other actions like 'list' or 'retrieve'
+        return [AllowAny()]
 
     def get_serializer_class(self):
         # Utiliza el serializer adecuado basado en el método
@@ -55,7 +67,7 @@ class EmpleadoViewset(viewsets.ModelViewSet):
         if serializer.is_valid():
             nombre = request.data.get('nombre')
             apellido_1 = request.data.get('apellido_1')
-            username = f"{nombre.lower()}.{apellido_1.lower()}"
+            username = f"{nombre.title()}.{apellido_1.title()}"
             password = 'password123'
             email = request.data.get('email')
 

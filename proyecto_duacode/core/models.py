@@ -45,7 +45,6 @@ class Empleado(models.Model):
     cumpleaños = models.DateField()  # Fecha de nacimiento
     is_on_leave = models.BooleanField(default=False)  # Indicador de si está de baja/vacaciones
     foto = models.ImageField(upload_to='empleados/', blank=True, null=True)  # Foto del empleado
-    
     # Relación con Rol
     rol = models.ForeignKey(RolModel, on_delete=models.CASCADE, default=5)
     # Relación con sede usando el nombre de la clase como cadena

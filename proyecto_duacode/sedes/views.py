@@ -2,13 +2,16 @@ from rest_framework import viewsets, status
 from .models import Sede, SalaReuniones, ReservaSala
 from .serializers import SedeSerializer, SalaReunionesSerializer, ReservaSalaSerializer
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from core.views import BasePermisos
+class SedeViewSet(BasePermisos):
 
-class SedeViewSet(viewsets.ModelViewSet):
+
     queryset = Sede.objects.all()
     serializer_class = SedeSerializer
 
 
-class SalaReunionesViewSet(viewsets.ModelViewSet):
+class SalaReunionesViewSet(BasePermisos):
     queryset = SalaReuniones.objects.all()
     serializer_class = SalaReunionesSerializer
 
@@ -28,9 +31,10 @@ class SalaReunionesViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-class ReservaSalaViewSet(viewsets.ModelViewSet):
+class ReservaSalaViewSet(BasePermisos):
     queryset = ReservaSala.objects.all()
     serializer_class = ReservaSalaSerializer
+
 
     def get_queryset(self):
         queryset = super().get_queryset()

@@ -1,6 +1,6 @@
 from django.urls import path
-from .views import upload_file
+from .views import Upload_File
 
 urlpatterns = [
-    path('', upload_file, name='upload_file'),  # Ruta para la página de carga
+    path('', Upload_File.as_view, name='Upload_File'),  # Ruta para la página de carga
 ]
