@@ -27,7 +27,8 @@ class RolModel(models.Model):
     nombre = models.CharField(max_length=50, choices=ROL_CHOICES)
 
     def __str__(self):
-        return self.nombre
+        # Se asegura de devolver el valor legible para el nombre
+        return dict(self.ROL_CHOICES).get(self.nombre, self.nombre)
 
 
 
@@ -44,7 +45,6 @@ class Empleado(models.Model):
     cumpleaños = models.DateField()  # Fecha de nacimiento
     is_on_leave = models.BooleanField(default=False)  # Indicador de si está de baja/vacaciones
     foto = models.ImageField(upload_to='empleados/', blank=True, null=True)  # Foto del empleado
-    
     # Relación con Rol
     rol = models.ForeignKey(RolModel, on_delete=models.CASCADE, default=5)
     # Relación con sede usando el nombre de la clase como cadena

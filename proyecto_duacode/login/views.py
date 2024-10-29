@@ -22,5 +22,15 @@ def login_view(request):
     return JsonResponse({'message': "Método no permitido."}, status=405)
 
 def logout_view(request):
-    logout(request)
-    return JsonResponse({'message': "Has sido desconectado."})
+    if request.user.is_authenticated:
+        # Si el usuario está autenticado, realizar el logout
+        username = request.user.username
+        logout(request)
+        
+        # Comprobar si el usuario fue desconectado correctamente
+        if not request.user.is_authenticated:
+            return JsonResponse({'message': f"{username} has been logged out."})
+        else:
+            return JsonResponse({'message': "Logout failed."}, status=500)
+    else:
+        return JsonResponse({'message': "No user is logged in."}, status=400)
