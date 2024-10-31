@@ -21,7 +21,7 @@ class BasePermisos(ModelViewSet):
 
 
 
-def test_view(request):
+def test_view():
     # Al conectarme a http://localhost:8000/api/empleados/test/ muestra una ruta 
     return HttpResponse("Esto es una prueba.")
 
@@ -87,4 +87,14 @@ class EmpleadoViewset(viewsets.ModelViewSet):
         else:
             logger.error("Errores de validación al crear empleado: %s", serializer.errors)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def destroy(self, request,pk=None):
+        try:
+            empleado = Empleado.objects.get(id=pk)
+            empleado.delete()
+            logger.info("Eliminando empleado con ID: %s", pk)
+            print("EMPLEADO ELIMINADO ID " ,pk)
+            return Response({'message': 'Empleado eliminado con éxito.'}, status=status.HTTP_204_NO_CONTENT)
+        except Empleado.DoesNotExist:
+            return Response({'error': 'Empleado no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
 

@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'login',
 ]
 
+#CSRF_COOKIE_SECURE = False  
 LOGOUT_REDIRECT_URL = '/'
 
 # Middleware
