@@ -55,11 +55,12 @@ class Empleado(models.Model):
 
     def save(self, *args, **kwargs):
         # Generar y guardar el código QR utilizando la función modular
-        qr_file = generate_qr_code(self)
-        self.qr_code.save(f'{self.nombre}_{self.apellido_1}_qr.png', qr_file, save=False)
+        if not self.pk:
+            qr_file = generate_qr_code(self)
+            self.qr_code.save(f'{self.nombre}_{self.apellido_1}_qr.png', qr_file, save=False)
 
-        # Llamar al método save() original para guardar el modelo
-        super().save(*args, **kwargs)
+            # Llamar al método save() original para guardar el modelo
+            super().save(*args, **kwargs)
 
     def __str__(self):
         return f'{self.nombre} {self.apellido_1} {self.apellido_2}'
