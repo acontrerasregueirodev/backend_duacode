@@ -1,0 +1,11 @@
+{
+  "nombre": "Jane",
+  "apellido_1": "Doe",
+  "apellido_2": "Smith",
+  "telefono": "+1234567890",
+  "fecha_contratacion": "2022-06-15",
+  "cumpleaños": "1990-08-10",
+  "is_on_leave": false,
+  "email": "jane.doe@example.com",
+  "rol": 1  // Este ID debe existir en RolModel
+}

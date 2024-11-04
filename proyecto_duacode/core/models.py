@@ -46,7 +46,7 @@ class Empleado(models.Model):
     is_on_leave = models.BooleanField(default=False)  # Indicador de si está de baja/vacaciones
     foto = models.ImageField(upload_to='empleados/', blank=True, null=True)  # Foto del empleado
     # Relación con Rol
-    rol = models.ForeignKey(RolModel, on_delete=models.CASCADE, default=5)
+    rol = models.ForeignKey(RolModel, on_delete=models.CASCADE)
     # Relación con sede usando el nombre de la clase como cadena
     sede = models.ForeignKey('sedes.Sede', on_delete=models.CASCADE, null=True, blank=True)  # Relación con Sede
 

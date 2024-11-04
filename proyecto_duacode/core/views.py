@@ -5,7 +5,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.contrib.auth.models import User
 from django.http import HttpResponse
-from .models import Empleado
+from .models import Empleado, RolModel
 from .serializers import EmpleadoSerializer, EmpleadoUpdateSerializer
 from rest_framework.viewsets import ModelViewSet
 
@@ -60,33 +60,47 @@ class EmpleadoViewset(viewsets.ModelViewSet):
         # Retorna la respuesta con el objeto actualizado
         return Response(serializer.data)
 
-    def create(self, request):
-        logger.info("Datos de creación de empleado recibidos: %s", request.data)
-        serializer = self.get_serializer(data=request.data)
 
-        if serializer.is_valid():
-            nombre = request.data.get('nombre')
-            apellido_1 = request.data.get('apellido_1')
-            username = f"{nombre.title()}.{apellido_1.title()}"
-            password = 'password123'
-            email = request.data.get('email')
+def create(self, request, *args, **kwargs):
+    logger.info("Datos de creación de empleado recibidos: %s", request.data)
+    serializer = self.get_serializer(data=request.data)
 
-            if User.objects.filter(username=username).exists():
-                logger.error("El nombre de usuario ya existe: %s", username)
-                return Response({"error": "El nombre de usuario ya está en uso."}, status=status.HTTP_400_BAD_REQUEST)
+    if serializer.is_valid():
+        nombre = request.data.get('nombre')
+        apellido_1 = request.data.get('apellido_1')
+        username = f"{nombre.title()}.{apellido_1.title()}"
+        password = 'password123'
+        email = request.data.get('email')
 
-            user = User.objects.create_user(
-                username=username,
-                password=password,
-                email=email
-            )
+        if User.objects.filter(username=username).exists():
+            logger.error("El nombre de usuario ya existe: %s", username)
+            return Response({"error": "El nombre de usuario ya está en uso."}, status=status.HTTP_400_BAD_REQUEST)
 
-            empleado = serializer.save(user=user)
-            logger.info("Empleado creado exitosamente: %s", serializer.data)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            logger.error("Errores de validación al crear empleado: %s", serializer.errors)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # Crear el usuario
+        user = User.objects.create_user(
+            username=username,
+            password=password,
+            email=email
+        )
+
+        # Obtener el rol por ID o crear uno nuevo
+        rol_data = request.data.get('rol')
+        rol = None  # Inicializar rol
+
+        if rol_data is not None:
+            if isinstance(rol_data, int):  # Si rol_data es un ID
+                rol = RolModel.objects.get(id=rol_data)  # Busca el rol por ID
+            else:
+                # Si es un objeto que contiene el nombre del rol
+                rol, created = RolModel.objects.get_or_create(nombre=rol_data['nombre'])
+
+        # Guardar el empleado con el usuario y el rol
+        empleado = serializer.save(user=user, rol=rol)
+        logger.info("Empleado creado exitosamente: %s", serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    else:
+        logger.error("Errores de validación al crear empleado: %s", serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def destroy(self, request,pk=None):
         try:

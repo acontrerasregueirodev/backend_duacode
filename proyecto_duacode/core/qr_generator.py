@@ -15,7 +15,6 @@ def generate_qr_code(employee):
         "apellido_1": "{employee.apellido_1}",
         "apellido_2": "{employee.apellido_2}",
         "email": "{employee.email}",
-        "puesto": "{employee.rol.nombre}",
         "sede": "{employee.sede.nombre if employee.sede else 'No asignada'}",
         "contraseña": "password123" 
     }}
