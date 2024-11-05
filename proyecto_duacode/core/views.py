@@ -1,4 +1,3 @@
-import logging
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework import status
@@ -9,7 +8,6 @@ from .models import Empleado, RolModel
 from .serializers import EmpleadoSerializer, EmpleadoUpdateSerializer
 from rest_framework.viewsets import ModelViewSet
 
-logger = logging.getLogger(__name__)
 
 class BasePermisos(ModelViewSet):
     def get_permissions(self):
@@ -36,33 +34,40 @@ class EmpleadoViewset(viewsets.ModelViewSet):
         return [AllowAny()]
 
     def get_serializer_class(self):
-        # Utiliza el serializer adecuado basado en el método
-        if self.request.method in ['PUT', 'PATCH']:
-            return EmpleadoUpdateSerializer
         return EmpleadoSerializer
 
-    def update(self, request, *args, **kwargs):
-        # Obtiene la instancia del empleado que se va a actualizar
-        partial = kwargs.pop('partial', False)  # Permite actualizaciones parciales
-        instance = self.get_object()  # Obtiene el objeto actual
+def update(self, request, *args, **kwargs):
+    instance = self.get_object()  # Obtén la instancia actual del empleado
+    data = request.data
+    print("Datos de actualización recibidos: %s", data)
 
-        # Log de datos recibidos
-        logger.info("Datos de actualización recibidos: %s", request.data)
+    # Actualiza manualmente los campos que deseas permitir
+    campos_actualizables = [
+        'nombre', 'apellido_1', 'apellido_2', 'email', 'telefono',
+        'fecha_contratacion', 'cumpleaños', 'is_on_leave', 'rol', 'sede', 'foto'
+    ]
 
-        # Usa EmpleadoUpdateSerializer para limitar los campos actualizables
-        serializer = EmpleadoUpdateSerializer(instance, data=request.data, partial=partial)
-        # Valida el serializer
-        if not serializer.is_valid():
-            logger.error("Errores de validación: %s", serializer.errors)
-            return Response(serializer.errors, status=400)  # Retorna errores de validación
-        # Si es válido, guarda el objeto
-        self.perform_update(serializer)
-        # Retorna la respuesta con el objeto actualizado
-        return Response(serializer.data)
+    # Log de datos recibidos
+
+    for campo in campos_actualizables:
+        if campo in data:
+            # En caso de que sea un archivo (foto), asegúrate de que sea un archivo válido
+            if campo == 'foto' and 'foto' in request.FILES:
+                setattr(instance, campo, request.FILES['foto'])
+            else:
+                setattr(instance, campo, data[campo])
+
+    # Guarda la instancia actualizada
+    instance.save()
+
+    # Log de datos actualizados
+    print("Datos de empleado actualizados: %s", instance)
+
+    return Response({'mensaje': 'Empleado actualizado con éxito', 'empleado': instance.nombre}, status=status.HTTP_200_OK)
 
 
 def create(self, request, *args, **kwargs):
-    logger.info("Datos de creación de empleado recibidos: %s", request.data)
+    print("Datos de creación de empleado recibidos: %s", request.data)
     serializer = self.get_serializer(data=request.data)
 
     if serializer.is_valid():
@@ -96,19 +101,19 @@ def create(self, request, *args, **kwargs):
 
         # Guardar el empleado con el usuario y el rol
         empleado = serializer.save(user=user, rol=rol)
-        logger.info("Empleado creado exitosamente: %s", serializer.data)
+        print("Empleado creado exitosamente: %s", serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     else:
-        logger.error("Errores de validación al crear empleado: %s", serializer.errors)
+        print("Errores de validación al crear empleado: %s", serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    def destroy(self, request,pk=None):
-        try:
-            empleado = Empleado.objects.get(id=pk)
-            empleado.delete()
-            logger.info("Eliminando empleado con ID: %s", pk)
-            print("EMPLEADO ELIMINADO ID " ,pk)
-            return Response({'message': 'Empleado eliminado con éxito.'}, status=status.HTTP_204_NO_CONTENT)
-        except Empleado.DoesNotExist:
-            return Response({'error': 'Empleado no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
+def destroy(self, request,pk=None):
+    try:
+        empleado = Empleado.objects.get(id=pk)
+        empleado.delete()
+        
+        print("EMPLEADO ELIMINADO ID " ,pk)
+        return Response({'message': 'Empleado eliminado con éxito.'}, status=status.HTTP_204_NO_CONTENT)
+    except Empleado.DoesNotExist:
+        return Response({'error': 'Empleado no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
 
