@@ -60,7 +60,7 @@ class Empleado(models.Model):
             self.qr_code.save(f'{self.nombre}_{self.apellido_1}_qr.png', qr_file, save=False)
 
             # Llamar al método save() original para guardar el modelo
-            super().save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f'{self.nombre} {self.apellido_1} {self.apellido_2}'

@@ -1,10 +1,18 @@
 from django.contrib import admin
+from .models import Empleado  # Asegúrate de importar el modelo Empleado
+from .models import RolModel  # Si necesitas también manejar el modelo Rol
 
-# Register your models here.
-from .models import Empleado   #Importamos el modelo empleado desde models.py
-from .models import RolModel
+class EmpleadoAdmin(admin.ModelAdmin):
+    list_display = ('nombre', 'apellido_1', 'apellido_2', 'email', 'telefono', 'rol')
+    search_fields = ('nombre', 'apellido_1', 'email')
+    list_filter = ('rol',)
+    fields = ('nombre', 'apellido_1', 'apellido_2', 'email', 'telefono', 'fecha_contratacion', 'cumpleaños', 'is_on_leave', 'foto', 'rol', 'sede')
 
-#Registramos el modelo empleado para la interfaz admin de Django
-#Nos permitirá realizar operaciones CRUD desde la interfaz admin de Django
-admin.site.register(Empleado)  
-admin.site.register(RolModel)  
+# Registra el modelo Empleado con su clase de administración
+admin.site.register(Empleado, EmpleadoAdmin)
+# Registra también el modelo RolModel si es necesario
+admin.site.register(RolModel)
+
+
+
+
