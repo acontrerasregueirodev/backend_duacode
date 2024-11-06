@@ -1,7 +1,7 @@
-from rest_framework import serializers
-from .models import Empleado, RolModel
 from proyectos.models import Proyecto
 from django.core.files.uploadedfile import InMemoryUploadedFile
+from rest_framework import serializers
+from .models import Empleado, RolModel
 
 class RolModelSerializer(serializers.ModelSerializer):
     class Meta:

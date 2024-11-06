@@ -4,16 +4,16 @@ from .models import Empleado
 from .serializers import EmpleadoSerializer
 from rest_framework.response import Response 
 
-class BasePermisos(viewsets.ModelViewSet):
+
+class EmpleadoViewset(viewsets.ModelViewSet):
+    queryset = Empleado.objects.all()
+    serializer_class = EmpleadoSerializer
+
     def get_permissions(self):
         if self.action in ['create', 'update', 'destroy']:
             return [IsAuthenticated()]
         return [AllowAny()]
-
-class EmpleadoViewset(BasePermisos):
-    queryset = Empleado.objects.all()
-    serializer_class = EmpleadoSerializer
-
+    
     def create(self, request, *args, **kwargs):
         print("Datos de creación de empleado recibidos:", request.data)
         return super().create(request, *args, **kwargs)

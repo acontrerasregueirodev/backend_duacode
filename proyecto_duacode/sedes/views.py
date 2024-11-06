@@ -3,17 +3,32 @@ from .models import Sede, SalaReuniones, ReservaSala
 from .serializers import SedeSerializer, SalaReunionesSerializer, ReservaSalaSerializer
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from core.views import BasePermisos
-class SedeViewSet(BasePermisos):
 
 
+class SedeViewSet(viewsets.ModelViewSet):
     queryset = Sede.objects.all()
     serializer_class = SedeSerializer
 
+    def get_permissions(self):
+        """
+        Devuelve los permisos basados en la acción que se esté realizando.
+        """
+        if self.action in ['create', 'update', 'destroy']:
+            return [IsAuthenticated()]
+        return [AllowAny()]  # Para otras acciones como 'list', cualquier usuario puede acceder
 
-class SalaReunionesViewSet(BasePermisos):
+
+class SalaReunionesViewSet(viewsets.ModelViewSet):
     queryset = SalaReuniones.objects.all()
     serializer_class = SalaReunionesSerializer
+
+    def get_permissions(self):
+        """
+        Devuelve los permisos basados en la acción que se esté realizando.
+        """
+        if self.action in ['create', 'update', 'destroy']:
+            return [IsAuthenticated()]
+        return [AllowAny()]  # Para otras acciones como 'list', cualquier usuario puede acceder
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -31,10 +46,17 @@ class SalaReunionesViewSet(BasePermisos):
         return Response(serializer.data)
 
 
-class ReservaSalaViewSet(BasePermisos):
+class ReservaSalaViewSet(viewsets.ModelViewSet):
     queryset = ReservaSala.objects.all()
     serializer_class = ReservaSalaSerializer
 
+    def get_permissions(self):
+        """
+        Devuelve los permisos basados en la acción que se esté realizando.
+        """
+        if self.action in ['create', 'update', 'destroy']:
+            return [IsAuthenticated()]
+        return [AllowAny()]  # Para otras acciones como 'list', cualquier usuario puede acceder
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -66,4 +88,3 @@ class ReservaSalaViewSet(BasePermisos):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-
