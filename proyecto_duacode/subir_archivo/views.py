@@ -42,7 +42,6 @@ class UploadFile(View):
 
 
 
-
 # from django.shortcuts import render, redirect
 # from .forms import FileUploadForm
 # from .models import SubirArchivo

@@ -10,4 +10,3 @@ urlpatterns = [
     path('', include(router.urls)),  # Esto evitará la duplicación de "proyectos"
 ]
 
-
