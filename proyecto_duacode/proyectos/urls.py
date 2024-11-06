@@ -1,8 +1,11 @@
 # urls.py
-from django.urls import path
-from . import views
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import ProyectoViewSet
+
+router = DefaultRouter()
+router.register(r'proyectos', ProyectoViewSet)
 
 urlpatterns = [
-    path('', views.listar_proyectos, name='listar_proyectos'),  # Ruta para listar proyectos
-    path('<int:proyecto_id>/eliminar/', views.eliminar_proyecto, name='eliminar_proyecto'),  # Ruta para eliminar proyectos
+    path('', include(router.urls)),
 ]

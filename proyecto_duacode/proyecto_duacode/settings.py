@@ -67,7 +67,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.AllowAny',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',  # Para autenticación por token
+        'rest_framework.authentication.BasicAuthentication',  # Para autenticación por token
         'rest_framework.authentication.SessionAuthentication',  # Para autenticación por sesión
     ],
 }

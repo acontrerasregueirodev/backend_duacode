@@ -1,23 +1,19 @@
 # views.py
+from rest_framework import viewsets, status
+from rest_framework.response import Response
+from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
-from django.http import JsonResponse
 from .models import Proyecto
-from django.contrib.auth.decorators import login_required
+from .serializers import ProyectoSerializer
+from rest_framework.permissions import IsAuthenticated
 
+class ProyectoViewSet(viewsets.ModelViewSet):
+    queryset = Proyecto.objects.all()
+    serializer_class = ProyectoSerializer
+    permission_classes = [IsAuthenticated]  # Requiere autenticación
 
-def listar_proyectos(request):
-    if request.method == 'GET':
-        proyectos = Proyecto.objects.all()
-        proyectos_data = [{"id": proyecto.id, "nombre": proyecto.nombre} for proyecto in proyectos]
-        return JsonResponse(proyectos_data, safe=False, status=200)
-
-    return JsonResponse({'error': 'Método no permitido'}, status=405)
-
-@login_required
-def eliminar_proyecto(request, proyecto_id):
-    proyecto = get_object_or_404(Proyecto, id=proyecto_id)
-    if request.method == 'DELETE':
+    @action(detail=True, methods=['delete'])
+    def eliminar_proyecto(self, request, pk=None):
+        proyecto = get_object_or_404(Proyecto, pk=pk)
         proyecto.delete()
-        return JsonResponse({'message': 'Proyecto eliminado exitosamente'}, status=200)
-
-    return JsonResponse({'error': 'Método no permitido'}, status=405)
+        return Response({'message': 'Proyecto eliminado exitosamente'}, status=status.HTTP_200_OK)
