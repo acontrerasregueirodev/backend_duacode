@@ -1,4 +1,6 @@
 
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import redirect
 from django.contrib.auth import authenticate, login, logout
 from django.http import JsonResponse
@@ -39,3 +41,12 @@ def logout_view(request):
     else:
         print('message No user is logged in.')
         return JsonResponse({'message': "No user is logged in."}, status=400)
+    
+
+def check_login(request):
+    print("accediendo a check login")
+
+    if request.user.is_authenticated:
+        return JsonResponse({"mensaje": "Estás autenticado"}, status=200)
+    else:
+        return JsonResponse({"mensaje": "No estás autenticado"}, status=200)
