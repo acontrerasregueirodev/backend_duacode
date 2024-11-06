@@ -10,7 +10,7 @@ from core.models import Empleado, RolModel
 from proyectos.models import Proyecto
 from sedes.models import Sede, SalaReuniones, ReservaSala
 from django.conf import settings
-from django.contrib.auth.models import User  # Importa el modelo User
+from django.contrib.auth.models import User, Group  # Importa el modelo User y Group
 
 class Command(BaseCommand):
     help = 'Genera datos ficticios para empleados, proyectos, sedes, salas y reuniones'
@@ -102,9 +102,13 @@ class Command(BaseCommand):
                 sede=sede_aleatoria
             )
             empleado.save()
-        self.stdout.write(self.style.SUCCESS(f'Empleado creado: {nombre} {apellido_1} {apellido_2}'))
 
-        self.stdout.write(self.style.SUCCESS(f'Se han generado {Empleado.objects.count()} empleados.'))
+            # Asignar permisos de administrador a todos los usuarios
+            user.is_staff = True  # Hacer al usuario un administrador de la interfaz
+            user.is_superuser = True  # Asignar permisos completos
+            user.save()
+
+        self.stdout.write(self.style.SUCCESS(f'Se han generado {Empleado.objects.count()} empleados con permisos de administrador.'))
 
         # Generar proyectos
         for _ in range(10):

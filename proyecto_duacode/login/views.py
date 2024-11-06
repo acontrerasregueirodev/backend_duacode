@@ -47,6 +47,6 @@ def check_login(request):
     print("accediendo a check login")
 
     if request.user.is_authenticated:
-        return JsonResponse({"mensaje": "Estás autenticado"}, status=200)
+        return JsonResponse({"mensaje": "Estás autenticado", 'user': request.user.username}, status=200)
     else:
         return JsonResponse({"mensaje": "No estás autenticado"}, status=200)

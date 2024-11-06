@@ -10,20 +10,28 @@ SECRET_KEY = 'django-insecure-fg9l&4x*jdh+1ct_*g4$1r1q9i-gi)@gs998x8olw537p$az7o
 DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
-
+SESSION_COOKIE_DOMAIN = "localhost"
 # CSRF and CORS settings
-CSRF_TRUSTED_ORIGINS = ['http://localhost:3000','http://localhost:8000']
-CORS_ALLOWED_ORIGINS = ['http://localhost:3000']
-CORS_ALLOW_CREDENTIALS = True
+CSRF_TRUSTED_ORIGINS = ['http://localhost:3000','http://localhost:8000','https://localhost:3000','https://localhost:8000']
+CORS_ALLOWED_ORIGINS = ['http://localhost:3000', 'http://localhost:8000']
+CORS_ALLOW_CREDENTIALS = True  # Permitir que las cookies y credenciales se envíen
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Asegúrate de que esté configurado correctamente
+
+# Si es necesario, también puedes agregar:
+# CORS_ALLOW_HEADERS = [
+#     'X-CSRFToken',  # Asegúrate de permitir el encabezado CSRFToken
+#     'Authorization',  # Si usas autorización con JWT o SessionID
+# ]
+CORS_ALLOW_ALL_ORIGINS = True
 
 
 
 # Installed apps
 INSTALLED_APPS = [
     'django.contrib.admin',
+    'django.contrib.sessions',
     'django.contrib.auth',
     'django.contrib.contenttypes',
-    'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
@@ -59,8 +67,8 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.AllowAny',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.TokenAuthentication',  # Para autenticación por token
+        'rest_framework.authentication.SessionAuthentication',  # Para autenticación por sesión
     ],
 }
 

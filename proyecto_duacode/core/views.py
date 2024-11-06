@@ -31,6 +31,7 @@ class EmpleadoViewset(viewsets.ModelViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, pk=None):
+        print("stamos en destro empleados")
         try:
             empleado = Empleado.objects.get(id=pk)
             empleado.delete()

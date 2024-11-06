@@ -1,12 +1,8 @@
-# proyectos/urls.py
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-from .views import ProyectoViewSet
-
-router = DefaultRouter()
-router.register(r'', ProyectoViewSet)  # Registra el prefijo "proyectos" solo una vez
+# urls.py
+from django.urls import path
+from . import views
 
 urlpatterns = [
-    path('', include(router.urls)),  # Esto evitará la duplicación de "proyectos"
+    path('', views.listar_proyectos, name='listar_proyectos'),  # Ruta para listar proyectos
+    path('<int:proyecto_id>/eliminar/', views.eliminar_proyecto, name='eliminar_proyecto'),  # Ruta para eliminar proyectos
 ]
-
