@@ -5,12 +5,16 @@ from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
 from .models import Proyecto
 from .serializers import ProyectoSerializer
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 class ProyectoViewSet(viewsets.ModelViewSet):
     queryset = Proyecto.objects.all()
     serializer_class = ProyectoSerializer
-    permission_classes = [IsAuthenticated]  # Requiere autenticación
+        # Método para definir permisos según la acción
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'destroy']:
+            return [IsAuthenticated()]  # Requiere autenticación para crear, actualizar y eliminar
+        return [AllowAny()]  # Permite acceso a GET sin autenticación
 
     @action(detail=True, methods=['delete'])
     def eliminar_proyecto(self, request, pk=None):
