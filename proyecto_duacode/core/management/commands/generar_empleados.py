@@ -149,11 +149,11 @@ class Command(BaseCommand):
 
         self.stdout.write(self.style.SUCCESS(f'Se han generado {len(salas_objs)} salas de reuniones con imágenes.'))
 
-        # Generar reservas de salas
-        for _ in range(10):
+        # Generar 100 reservas de salas en los próximos 15 días, de 1 hora y 30 minutos cada una
+        for _ in range(100):
             sala_aleatoria = random.choice(salas_objs)
-            fecha_inicio = timezone.now() + timedelta(days=random.randint(1, 30), hours=random.randint(8, 18))
-            fecha_fin = fecha_inicio + timedelta(hours=2)
+            fecha_inicio = timezone.now() + timedelta(days=random.randint(1, 15), hours=random.randint(8, 18))
+            fecha_fin = fecha_inicio + timedelta(hours=1, minutes=30)
 
             asistentes = random.sample(list(Empleado.objects.all()), random.randint(2, 5))
             empleado_reservador = random.choice(Empleado.objects.all())
@@ -167,4 +167,4 @@ class Command(BaseCommand):
             reserva.empleados_asistentes.set(asistentes)
             reserva.save()
 
-        self.stdout.write(self.style.SUCCESS('Se han generado las reservas de las salas de reuniones correctamente.'))
+        self.stdout.write(self.style.SUCCESS('Se han generado las 100 reservas de las salas de reuniones correctamente.'))
