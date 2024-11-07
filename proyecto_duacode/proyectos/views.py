@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
 from .models import Proyecto
+from core.models import Empleado
 from .serializers import ProyectoSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
@@ -23,17 +24,30 @@ class ProyectoViewSet(viewsets.ModelViewSet):
         return Response({'message': 'Proyecto eliminado exitosamente'}, status=status.HTTP_200_OK)
 
 
-     # Overriding the update method to handle editing a project
+        # Sobrescribir el método update para manejar la relación ManyToMany
     def update(self, request, *args, **kwargs):
-        # Retrieve the project object
+        # Recuperar el objeto Proyecto a editar
         proyecto = self.get_object()
 
-        # Serialize the request data and validate
-        serializer = self.get_serializer(proyecto, data=request.data, partial=True)  # partial=True allows partial updates
-        if serializer.is_valid():
-            # Save the updated project
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+        # Serializar los datos recibidos
+        serializer = self.get_serializer(proyecto, data=request.data, partial=True)
 
-        # If validation fails, return an error response
+        if serializer.is_valid():
+            # Guardar el proyecto (esto guardará la información básica del proyecto)
+            proyecto = serializer.save()
+
+            # Ahora, actualizamos la relación ManyToMany de empleados
+            if 'empleados' in request.data:
+                # Recuperar los IDs de los empleados
+                empleados_ids = request.data['empleados']
+
+                # Obtener los objetos empleados correspondientes a esos IDs
+                empleados = Empleado.objects.filter(id__in=empleados_ids)
+
+                # Limpiar la relación actual y asociar los nuevos empleados
+                proyecto.empleados.set(empleados)
+
+            # Devuelve los datos actualizados del proyecto
+            return Response(ProyectoSerializer(proyecto).data, status=status.HTTP_200_OK)
+        
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
