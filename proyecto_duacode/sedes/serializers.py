@@ -1,38 +1,36 @@
 from rest_framework import serializers
 from .models import Sede, SalaReuniones, ReservaSala
-from core.models import Empleado  # Asegúrate de tener la importación correcta de 'Empleado'
-
+from core.models import Empleado  # Asegúrate de que el modelo Empleado está importado si lo usas
 
 class SedeSerializer(serializers.ModelSerializer):
-    # Incluir las salas de reuniones relacionadas con la sede
-    salas = serializers.StringRelatedField(many=True, read_only=True)
-
     class Meta:
         model = Sede
-        fields = ['id', 'nombre', 'direccion', 'ciudad', 'pais', 'salas']
-
+        fields = '__all__'  # Incluye todos los campos del modelo Sede
 
 class SalaReunionesSerializer(serializers.ModelSerializer):
-    # Mostrar los detalles de la sede relacionada
-    sede = SedeSerializer(read_only=True)
-    # Incluir las reservas de la sala
-    reservas = serializers.StringRelatedField(many=True, read_only=True)
-    # Mostrar si la sala está ocupada usando la propiedad 'is_ocupada'
-    is_ocupada = serializers.ReadOnlyField()
+    # Si deseas agregar un campo calculado (como is_ocupada), puedes hacerlo aquí.
+    is_ocupada = serializers.BooleanField(read_only=True)  # campo calculado solo de lectura
 
     class Meta:
         model = SalaReuniones
-        fields = ['id', 'nombre', 'capacidad', 'sede', 'imagen_url', 'reservas', 'is_ocupada']
-
+        fields = '__all__'  # Incluye todos los campos del modelo SalaReuniones
 
 class ReservaSalaSerializer(serializers.ModelSerializer):
-    # Mostrar los detalles de la sala reservada
-    sala = SalaReunionesSerializer(read_only=True)
-    # Mostrar el nombre del empleado que reservó la sala
-    reservado_por = serializers.StringRelatedField(read_only=True)
-    # Mostrar los asistentes a la reunión
-    empleados_asistentes = serializers.StringRelatedField(many=True, read_only=True)
+    reservado_por = serializers.PrimaryKeyRelatedField(queryset=Empleado.objects.all())  # Relaciona con el modelo Empleado
+    empleados_asistentes = serializers.PrimaryKeyRelatedField(queryset=Empleado.objects.all(), many=True, required=False)  # Relaciona con el modelo Empleado
+
+    fecha_inicio = serializers.DateTimeField()  # Representa la fecha y hora de inicio como un campo DateTime
+    fecha_fin = serializers.DateTimeField()  # Representa la fecha y hora de fin como un campo DateTime
 
     class Meta:
         model = ReservaSala
-        fields = ['id', 'sala', 'reservado_por', 'fecha_inicio', 'fecha_fin', 'empleados_asistentes']
+        fields = '__all__'  # Incluye todos los campos del modelo ReservaSala
+
+    def validate(self, data):
+        """
+        Valida que las fechas de inicio y fin sean correctas.
+        Asegúrate de que la fecha de inicio sea anterior a la fecha de fin.
+        """
+        if data['fecha_inicio'] >= data['fecha_fin']:
+            raise serializers.ValidationError("La fecha de inicio debe ser anterior a la fecha de fin.")
+        return data

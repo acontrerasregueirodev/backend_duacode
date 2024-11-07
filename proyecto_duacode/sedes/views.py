@@ -3,7 +3,8 @@ from .models import Sede, SalaReuniones, ReservaSala
 from .serializers import SedeSerializer, SalaReunionesSerializer, ReservaSalaSerializer
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
-
+from django.utils import timezone
+from datetime import timedelta
 
 class SedeViewSet(viewsets.ModelViewSet):
     queryset = Sede.objects.all()
@@ -59,13 +60,31 @@ class ReservaSalaViewSet(viewsets.ModelViewSet):
         return [AllowAny()]  # Para otras acciones como 'list', cualquier usuario puede acceder
 
     def get_queryset(self):
+        """
+        Filtra las reservas basadas en si son futuras o pasadas.
+        """
         queryset = super().get_queryset()
         sala_id = self.request.query_params.get('sala_id')
         if sala_id:
             queryset = queryset.filter(sala_id=sala_id)
+        
+        # Filtrar por reservas pasadas
+        fecha_actual = timezone.now()
+
+        # Filtrar por reservas pasadas
+        if self.request.query_params.get('pasadas') == 'true':
+            queryset = queryset.filter(fecha_fin__lt=fecha_actual)
+
+        # Filtrar por reservas futuras
+        if self.request.query_params.get('futuras') == 'true':
+            queryset = queryset.filter(fecha_inicio__gte=fecha_actual)
+
         return queryset
 
     def create(self, request, *args, **kwargs):
+        """
+        Sobrescribe el método create para comprobar que no haya solapamientos en las reservas.
+        """
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
