@@ -21,3 +21,19 @@ class ProyectoViewSet(viewsets.ModelViewSet):
         proyecto = get_object_or_404(Proyecto, pk=pk)
         proyecto.delete()
         return Response({'message': 'Proyecto eliminado exitosamente'}, status=status.HTTP_200_OK)
+
+
+     # Overriding the update method to handle editing a project
+    def update(self, request, *args, **kwargs):
+        # Retrieve the project object
+        proyecto = self.get_object()
+
+        # Serialize the request data and validate
+        serializer = self.get_serializer(proyecto, data=request.data, partial=True)  # partial=True allows partial updates
+        if serializer.is_valid():
+            # Save the updated project
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        # If validation fails, return an error response
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
