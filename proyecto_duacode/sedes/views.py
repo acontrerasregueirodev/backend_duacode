@@ -3,7 +3,7 @@ from .models import Sede, SalaReuniones, ReservaSala
 from .serializers import SedeSerializer, SalaReunionesSerializer, ReservaSalaSerializer
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
-
+from django.utils import timezone
 
 class SedeViewSet(viewsets.ModelViewSet):
     queryset = Sede.objects.all()
@@ -45,7 +45,6 @@ class SalaReunionesViewSet(viewsets.ModelViewSet):
         serializer = SalaReunionesSerializer(queryset, many=True, context={'request': request})
         return Response(serializer.data)
 
-
 class ReservaSalaViewSet(viewsets.ModelViewSet):
     queryset = ReservaSala.objects.all()
     serializer_class = ReservaSalaSerializer
@@ -54,31 +53,50 @@ class ReservaSalaViewSet(viewsets.ModelViewSet):
         """
         Devuelve los permisos basados en la acción que se esté realizando.
         """
-        if self.action in ['create', 'update', 'destroy']:
+        if self.action in ['create', 'update', 'destroy']:  # Incluir 'destroy' para eliminar
             return [IsAuthenticated()]
         return [AllowAny()]  # Para otras acciones como 'list', cualquier usuario puede acceder
 
     def get_queryset(self):
+        """
+        Filtra las reservas basadas en si son futuras o pasadas.
+        """
         queryset = super().get_queryset()
         sala_id = self.request.query_params.get('sala_id')
         if sala_id:
             queryset = queryset.filter(sala_id=sala_id)
+        
+        ahora = timezone.now().time()
+        hoy = timezone.now().date()
+
+        if self.request.query_params.get('pasadas') == 'true':
+            queryset = queryset.filter(fecha__lt=hoy)
+
+        if self.request.query_params.get('futuras') == 'true':
+            queryset = queryset.filter(fecha__gt=hoy)
+
         return queryset
 
     def create(self, request, *args, **kwargs):
+        """
+        Sobrescribe el método create para comprobar que no haya solapamientos en las reservas.
+        """
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         sala = serializer.validated_data['sala']
-        fecha_inicio = serializer.validated_data['fecha_inicio']
-        fecha_fin = serializer.validated_data['fecha_fin']
+        fecha = serializer.validated_data['fecha']
+        hora_inicio = serializer.validated_data['hora_inicio']
+        hora_fin = serializer.validated_data['hora_fin']
 
-        # Comprobar disponibilidad
+        # Comprobar disponibilidad para evitar solapamientos
         reservas_existentes = ReservaSala.objects.filter(
             sala=sala,
-            fecha_inicio__lt=fecha_fin,
-            fecha_fin__gt=fecha_inicio
+            fecha=fecha,
+            hora_inicio__lt=hora_fin,
+            hora_fin__gt=hora_inicio
         )
+
         if reservas_existentes.exists():
             return Response(
                 {'detail': 'La sala ya está reservada en este intervalo de tiempo.'},
@@ -88,3 +106,11 @@ class ReservaSalaViewSet(viewsets.ModelViewSet):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def destroy(self, request, *args, **kwargs):
+        """
+        Sobrescribe el método destroy para manejar la eliminación de la reserva.
+        """
+        instance = self.get_object()  # Obtiene la instancia de la reserva a eliminar
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)

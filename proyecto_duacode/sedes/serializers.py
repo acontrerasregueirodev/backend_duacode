@@ -1,38 +1,46 @@
 from rest_framework import serializers
 from .models import Sede, SalaReuniones, ReservaSala
-from core.models import Empleado  # Asegúrate de tener la importación correcta de 'Empleado'
+from core.models import Empleado
 
 
+# Serializer para los empleados
+class EmpleadoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Empleado
+        fields = ['id', 'nombre', 'apellido_1', 'apellido_2', 'email']
+
+
+# Serializer para las salas de reuniones
+class SalaReunionesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SalaReuniones
+        fields = ['id', 'nombre', 'capacidad', 'sede', 'imagen_url']
+
+
+# Serializer para las sedes, incluyendo sus salas de reuniones
 class SedeSerializer(serializers.ModelSerializer):
-    # Incluir las salas de reuniones relacionadas con la sede
-    salas = serializers.StringRelatedField(many=True, read_only=True)
+    salas = SalaReunionesSerializer(many=True, read_only=True)
 
     class Meta:
         model = Sede
         fields = ['id', 'nombre', 'direccion', 'ciudad', 'pais', 'salas']
 
 
-class SalaReunionesSerializer(serializers.ModelSerializer):
-    # Mostrar los detalles de la sede relacionada
-    sede = SedeSerializer(read_only=True)
-    # Incluir las reservas de la sala
-    reservas = serializers.StringRelatedField(many=True, read_only=True)
-    # Mostrar si la sala está ocupada usando la propiedad 'is_ocupada'
-    is_ocupada = serializers.ReadOnlyField()
-
-    class Meta:
-        model = SalaReuniones
-        fields = ['id', 'nombre', 'capacidad', 'sede', 'imagen_url', 'reservas', 'is_ocupada']
-
-
+# Serializer para las reservas de sala
 class ReservaSalaSerializer(serializers.ModelSerializer):
-    # Mostrar los detalles de la sala reservada
     sala = SalaReunionesSerializer(read_only=True)
-    # Mostrar el nombre del empleado que reservó la sala
-    reservado_por = serializers.StringRelatedField(read_only=True)
-    # Mostrar los asistentes a la reunión
-    empleados_asistentes = serializers.StringRelatedField(many=True, read_only=True)
+    reservado_por = EmpleadoSerializer(read_only=True)
+    empleados_asistentes = EmpleadoSerializer(many=True, read_only=True)
 
     class Meta:
         model = ReservaSala
-        fields = ['id', 'sala', 'reservado_por', 'fecha_inicio', 'fecha_fin', 'empleados_asistentes']
+        fields = ['id', 'sala', 'reservado_por', 'fecha', 'hora_inicio', 'hora_fin', 'empleados_asistentes']
+
+    def create(self, validated_data):
+        asistentes_data = self.initial_data.get('empleados_asistentes', [])
+        reserva = ReservaSala.objects.create(**validated_data)
+        if asistentes_data:
+            asistentes = Empleado.objects.filter(id__in=asistentes_data)
+            reserva.empleados_asistentes.set(asistentes)
+        return reserva
+
