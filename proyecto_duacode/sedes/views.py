@@ -1,9 +1,11 @@
 from rest_framework import viewsets, status
-from .models import Sede, SalaReuniones, ReservaSala
-from .serializers import SedeSerializer, SalaReunionesSerializer, ReservaSalaSerializer
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from .models import Sede, SalaReuniones, ReservaSala
+from .serializers import SedeSerializer, SalaReunionesSerializer, ReservaSalaSerializer
 
 class SedeViewSet(viewsets.ModelViewSet):
     queryset = Sede.objects.all()
@@ -50,17 +52,11 @@ class ReservaSalaViewSet(viewsets.ModelViewSet):
     serializer_class = ReservaSalaSerializer
 
     def get_permissions(self):
-        """
-        Devuelve los permisos basados en la acción que se esté realizando.
-        """
-        if self.action in ['create', 'update', 'destroy']:  # Incluir 'destroy' para eliminar
+        if self.action in ['create', 'update', 'destroy']:
             return [IsAuthenticated()]
-        return [AllowAny()]  # Para otras acciones como 'list', cualquier usuario puede acceder
+        return [AllowAny()]
 
     def get_queryset(self):
-        """
-        Filtra las reservas basadas en si son futuras o pasadas.
-        """
         queryset = super().get_queryset()
         sala_id = self.request.query_params.get('sala_id')
         if sala_id:
@@ -78,9 +74,6 @@ class ReservaSalaViewSet(viewsets.ModelViewSet):
         return queryset
 
     def create(self, request, *args, **kwargs):
-        """
-        Sobrescribe el método create para comprobar que no haya solapamientos en las reservas.
-        """
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -89,7 +82,6 @@ class ReservaSalaViewSet(viewsets.ModelViewSet):
         hora_inicio = serializer.validated_data['hora_inicio']
         hora_fin = serializer.validated_data['hora_fin']
 
-        # Comprobar disponibilidad para evitar solapamientos
         reservas_existentes = ReservaSala.objects.filter(
             sala=sala,
             fecha=fecha,
@@ -107,10 +99,11 @@ class ReservaSalaViewSet(viewsets.ModelViewSet):
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-    def destroy(self, request, *args, **kwargs):
+    @action(detail=True, methods=['delete'], permission_classes=[IsAuthenticated])
+    def eliminar_reserva(self, request, pk=None):
         """
-        Sobrescribe el método destroy para manejar la eliminación de la reserva.
+        Acción personalizada para eliminar una reserva específica.
         """
-        instance = self.get_object()  # Obtiene la instancia de la reserva a eliminar
-        self.perform_destroy(instance)
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        reserva = get_object_or_404(ReservaSala, pk=pk)
+        reserva.delete()
+        return Response({'message': 'Reserva eliminada exitosamente'}, status=status.HTTP_200_OK)
