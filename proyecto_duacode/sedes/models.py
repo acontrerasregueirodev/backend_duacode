@@ -22,15 +22,6 @@ class SalaReuniones(models.Model):
     def __str__(self):
         return f'{self.nombre} en {self.sede.nombre}'
 
-    @property
-    def is_ocupada(self):
-        """
-        Determina si la sala está ocupada en función de las reservas actuales.
-        """
-        ahora = timezone.now()
-        # Uso correcto de los filtros __lte (menor o igual) y __gte (mayor o igual)
-        return self.reservas.filter(fecha_inicio__lte=ahora, fecha_fin__gte=ahora).exists()
-
     class Meta:
         db_table = 'salas_reuniones'
 

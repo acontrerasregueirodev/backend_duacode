@@ -1,51 +1,15 @@
-from rest_framework import viewsets, status
-from rest_framework.decorators import action
-from rest_framework.response import Response
+from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from django.shortcuts import get_object_or_404
-from django.utils import timezone
-from .models import Sede, SalaReuniones, ReservaSala
-from .serializers import SedeSerializer, SalaReunionesSerializer, ReservaSalaSerializer
+from rest_framework.response import Response
+from rest_framework import status
+from .models import ReservaSala, Sede
+from core.models import Empleado
+from .serializers import ReservaSalaSerializer, SedeSerializer
+from rest_framework.exceptions import NotFound
 
 class SedeViewSet(viewsets.ModelViewSet):
-    queryset = Sede.objects.all()
-    serializer_class = SedeSerializer
-
-    def get_permissions(self):
-        """
-        Devuelve los permisos basados en la acción que se esté realizando.
-        """
-        if self.action in ['create', 'update', 'destroy']:
-            return [IsAuthenticated()]
-        return [AllowAny()]  # Para otras acciones como 'list', cualquier usuario puede acceder
-
-
-class SalaReunionesViewSet(viewsets.ModelViewSet):
-    queryset = SalaReuniones.objects.all()
-    serializer_class = SalaReunionesSerializer
-
-    def get_permissions(self):
-        """
-        Devuelve los permisos basados en la acción que se esté realizando.
-        """
-        if self.action in ['create', 'update', 'destroy']:
-            return [IsAuthenticated()]
-        return [AllowAny()]  # Para otras acciones como 'list', cualquier usuario puede acceder
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        sede_id = self.request.query_params.get('sede_id')
-        if sede_id:
-            queryset = queryset.filter(sede_id=sede_id)
-        return queryset
-
-    def list(self, request, *args, **kwargs):
-        """
-        Sobrescribe el método list para incluir las imágenes de las salas.
-        """
-        queryset = self.get_queryset()
-        serializer = SalaReunionesSerializer(queryset, many=True, context={'request': request})
-        return Response(serializer.data)
+    queryset = Sede.objects.all()  # Recuperar todas las sedes
+    serializer_class = SedeSerializer  # Usar el serializer definido antes
 
 class ReservaSalaViewSet(viewsets.ModelViewSet):
     queryset = ReservaSala.objects.all()
@@ -58,52 +22,42 @@ class ReservaSalaViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        sala_id = self.request.query_params.get('sala_id')
-        if sala_id:
-            queryset = queryset.filter(sala_id=sala_id)
-        
-        ahora = timezone.now().time()
-        hoy = timezone.now().date()
-
-        if self.request.query_params.get('pasadas') == 'true':
-            queryset = queryset.filter(fecha__lt=hoy)
-
-        if self.request.query_params.get('futuras') == 'true':
-            queryset = queryset.filter(fecha__gt=hoy)
-
+        fecha = self.request.query_params.get('fecha', None)
+        if fecha:
+            queryset = queryset.filter(fecha=fecha)
         return queryset
 
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+    def perform_create(self, serializer):
+        try:
+            empleado = Empleado.objects.get(user=self.request.user)  # Si tienes esta relación
+            serializer.save(reservado_por=empleado)
+        except Empleado.DoesNotExist:
+            raise ValueError("No se encontró un Empleado asociado al usuario actual.")
 
-        sala = serializer.validated_data['sala']
-        fecha = serializer.validated_data['fecha']
-        hora_inicio = serializer.validated_data['hora_inicio']
-        hora_fin = serializer.validated_data['hora_fin']
+    def destroy(self, request, *args, **kwargs):
+        """Método para eliminar una reserva"""
+        print("Intentando eliminar reserva con ID:", kwargs['pk'])  # Imprime el ID de la reserva a eliminar
 
-        reservas_existentes = ReservaSala.objects.filter(
-            sala=sala,
-            fecha=fecha,
-            hora_inicio__lt=hora_fin,
-            hora_fin__gt=hora_inicio
-        )
+        try:
+            # Obtener la reserva por ID
+            reserva = self.get_object()  # Esto busca la reserva según el `pk` pasado en la URL
+            
+            # Imprimir detalles de la reserva
+            print(f"reserva :{reserva}")
+            print(f"Reserva encontrada: {reserva.id} - {reserva.reservado_por.user.username}")
+            print(f"Usuario autenticado: {request.user.username}")
 
-        if reservas_existentes.exists():
-            return Response(
-                {'detail': 'La sala ya está reservada en este intervalo de tiempo.'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-
-    @action(detail=True, methods=['delete'], permission_classes=[IsAuthenticated])
-    def eliminar_reserva(self, request, pk=None):
-        """
-        Acción personalizada para eliminar una reserva específica.
-        """
-        reserva = get_object_or_404(ReservaSala, pk=pk)
-        reserva.delete()
-        return Response({'message': 'Reserva eliminada exitosamente'}, status=status.HTTP_200_OK)
+            # Verificar si el usuario tiene permiso para eliminar esta reserva
+            if reserva.reservado_por.user != request.user:
+                print(f"Usuario {request.user.username} no tiene permisos para eliminar esta reserva.")
+                return Response(
+                    {"detail": "No tienes permiso para eliminar esta reserva."},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+            
+            reserva.delete()  # Eliminar la reserva
+            print(f"Reserva con ID {reserva.id} eliminada con éxito.")  # Confirmación de eliminación
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except ReservaSala.DoesNotExist:
+            print("Reserva no encontrada")  # Mensaje si no se encuentra la reserva
+            raise NotFound(detail="Reserva no encontrada.")
