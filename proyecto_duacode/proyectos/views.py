@@ -17,8 +17,13 @@ class ProyectoViewSet(viewsets.ModelViewSet):
             return [IsAuthenticated()]  # Requiere autenticación para crear, actualizar y eliminar
         return [AllowAny()]  # Permite acceso a GET sin autenticación
 
-    @action(detail=True, methods=['delete'])
+# Acción para eliminar el proyecto
+    @action(detail=True, methods=['delete'], permission_classes=[IsAuthenticated])  # Asegurando autenticación aquí también
     def eliminar_proyecto(self, request, pk=None):
+        # Verificar si el usuario está autenticado antes de proceder
+        if not request.user.is_authenticated:
+            raise PermissionDenied("No tienes permiso para realizar esta acción.")
+
         proyecto = get_object_or_404(Proyecto, pk=pk)
         proyecto.delete()
         return Response({'message': 'Proyecto eliminado exitosamente'}, status=status.HTTP_200_OK)

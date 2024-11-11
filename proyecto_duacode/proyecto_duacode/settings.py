@@ -18,10 +18,10 @@ CORS_ALLOW_CREDENTIALS = True  # Permitir que las cookies y credenciales se env�
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Asegúrate de que esté configurado correctamente
 
 # Si es necesario, también puedes agregar:
-# CORS_ALLOW_HEADERS = [
-#     'X-CSRFToken',  # Asegúrate de permitir el encabezado CSRFToken
-#     'Authorization',  # Si usas autorización con JWT o SessionID
-# ]
+CORS_ALLOW_HEADERS = [
+    'content-type',
+    'x-csrftoken',
+]
 CORS_ALLOW_ALL_ORIGINS = True
 
 
@@ -60,6 +60,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 # REST framework settings
 REST_FRAMEWORK = {
@@ -67,7 +68,6 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.AllowAny',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.BasicAuthentication',  # Para autenticación por token
         'rest_framework.authentication.SessionAuthentication',  # Para autenticación por sesión
     ],
 }
