@@ -1,10 +1,17 @@
 from rest_framework import serializers
 from .models import ReservaSala, Sede, SalaReuniones
 from core.models import Empleado  # Importar el modelo de Empleado
+
 class SedeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sede
         fields = ['id', 'nombre', 'direccion', 'ciudad', 'pais']
+        
+        # Serializer para las salas de reuniones
+class SalaReunionesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SalaReuniones
+        fields = ['id', 'nombre', 'capacidad', 'sede', 'imagen_url']
 # Serializer para el modelo ReservaSala
 class ReservaSalaSerializer(serializers.ModelSerializer):
     sala = serializers.PrimaryKeyRelatedField(queryset=SalaReuniones.objects.all())

@@ -18,10 +18,10 @@ CORS_ALLOW_CREDENTIALS = True  # Permitir que las cookies y credenciales se env�
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Asegúrate de que esté configurado correctamente
 
 # Si es necesario, también puedes agregar:
-CORS_ALLOW_HEADERS = [
-    'content-type',
-    'x-csrftoken',
-]
+# CORS_ALLOW_HEADERS = [
+#     'content-type',
+#     'x-csrftoken',
+# ]
 CORS_ALLOW_ALL_ORIGINS = True
 
 

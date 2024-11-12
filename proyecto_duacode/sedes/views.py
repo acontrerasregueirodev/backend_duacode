@@ -2,9 +2,9 @@ from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework import status
-from .models import ReservaSala, Sede
+from .models import ReservaSala, Sede, SalaReuniones
 from core.models import Empleado
-from .serializers import ReservaSalaSerializer, SedeSerializer
+from .serializers import ReservaSalaSerializer, SedeSerializer, SalaReunionesSerializer
 from rest_framework.exceptions import NotFound
 
 class SedeViewSet(viewsets.ModelViewSet):
@@ -71,3 +71,30 @@ class ReservaSalaViewSet(viewsets.ModelViewSet):
         except ReservaSala.DoesNotExist:
             print("Reserva no encontrada")
             raise NotFound(detail="Reserva no encontrada.")
+
+class SalaReunionesViewSet(viewsets.ModelViewSet):
+    queryset = SalaReuniones.objects.all()
+    serializer_class = SalaReunionesSerializer
+
+    def get_permissions(self):
+        """
+        Devuelve los permisos basados en la acción que se esté realizando.
+        """
+        if self.action in ['create', 'update', 'destroy']:
+            return [IsAuthenticated()]
+        return [AllowAny()]  # Para otras acciones como 'list', cualquier usuario puede acceder
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        sede_id = self.request.query_params.get('sede_id')
+        if sede_id:
+            queryset = queryset.filter(sede_id=sede_id)
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        """
+        Sobrescribe el método list para incluir las imágenes de las salas.
+        """
+        queryset = self.get_queryset()
+        serializer = SalaReunionesSerializer(queryset, many=True, context={'request': request})
+        return Response(serializer.data)
