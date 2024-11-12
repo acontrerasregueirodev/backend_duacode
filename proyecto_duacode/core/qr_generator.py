@@ -9,13 +9,13 @@ def generate_qr_code(employee):
     #encrypted_password = make_password(employee.user.password)
 
     # Generar el contenido del QR (en este caso un JSON con la información del empleado)
+ 
     qr_content = f"""
     {{
         "nombre": "{employee.nombre}",
         "apellido_1": "{employee.apellido_1}",
         "apellido_2": "{employee.apellido_2}",
         "email": "{employee.email}",
-        "puesto": "{employee.rol.nombre}",
         "sede": "{employee.sede.nombre if employee.sede else 'No asignada'}",
         "contraseña": "password123" 
     }}

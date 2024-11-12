@@ -1,19 +1,88 @@
-from rest_framework import viewsets, status
-from .models import Sede, SalaReuniones, ReservaSala
-from .serializers import SedeSerializer, SalaReunionesSerializer, ReservaSalaSerializer
-from rest_framework.response import Response
+from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from core.views import BasePermisos
-class SedeViewSet(BasePermisos):
+from rest_framework.response import Response
+from rest_framework import status
+from .models import ReservaSala, Sede, SalaReuniones
+from core.models import Empleado
+from .serializers import ReservaSalaSerializer, SedeSerializer, SalaReunionesSerializer
+from rest_framework.exceptions import NotFound
+
+class SedeViewSet(viewsets.ModelViewSet):
+    queryset = Sede.objects.all()  # Recuperar todas las sedes
+    serializer_class = SedeSerializer  # Usar el serializer definido antes
+
+class ReservaSalaViewSet(viewsets.ModelViewSet):
+    queryset = ReservaSala.objects.all()
+    serializer_class = ReservaSalaSerializer
+
+    # def get_permissions(self):
+    #     if self.action in ['create', 'update','delete']:
+    #         print(IsAuthenticated())
+    #         return [IsAuthenticated()]
+    #     return [AllowAny()]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        fecha = self.request.query_params.get('fecha', None)
+        if fecha:
+            queryset = queryset.filter(fecha=fecha)
+        return queryset
+
+    def perform_create(self, serializer):
+        try:
+            empleado = Empleado.objects.get(user=self.request.user)  # Si tienes esta relación
+            serializer.save(reservado_por=empleado)
+        except Empleado.DoesNotExist:
+            raise ValueError("No se encontró un Empleado asociado al usuario actual.")
 
 
-    queryset = Sede.objects.all()
-    serializer_class = SedeSerializer
 
+    def get_permissions(self):
+        """Verifica que el usuario esté autenticado solo para actualizar o eliminar."""
+        if self.action in ['update', 'partial_update', 'destroy']:
+            return [IsAuthenticated()]  # Solo autenticados pueden hacer update y delete
+        return super().get_permissions()
 
-class SalaReunionesViewSet(BasePermisos):
+    def perform_update(self, serializer):
+        print("Intentando actualizar reserva con ID:", self.kwargs['pk'])
+        
+        # Obtener la reserva actual
+        reserva = self.get_object()
+        print(f"Reserva a actualizar: {reserva}")
+        print(f"Usuario autenticado: {self.request.user.username}")
+
+        # Permitir la actualización
+        serializer.save()
+        print(f"Reserva con ID {reserva.id} actualizada con éxito.")
+        return Response(status=status.HTTP_200_OK)
+
+    def destroy(self, request, *args, **kwargs):
+        print("Intentando eliminar reserva con ID:", kwargs['pk'])
+
+        try:
+            reserva = self.get_object()
+            print(f"Usuario autenticado: {request.user.username}")
+
+            # Eliminar la reserva sin restricciones
+            reserva.delete()
+            print(f"Reserva con ID {reserva.id} eliminada con éxito.")
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        except ReservaSala.DoesNotExist:
+            print("Reserva no encontrada")
+            raise NotFound(detail="Reserva no encontrada.")
+
+class SalaReunionesViewSet(viewsets.ModelViewSet):
     queryset = SalaReuniones.objects.all()
     serializer_class = SalaReunionesSerializer
+
+    def get_permissions(self):
+        """
+        Devuelve los permisos basados en la acción que se esté realizando.
+        """
+        if self.action in ['create', 'update', 'destroy']:
+            return [IsAuthenticated()]
+        return [AllowAny()]  # Para otras acciones como 'list', cualquier usuario puede acceder
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -29,41 +98,3 @@ class SalaReunionesViewSet(BasePermisos):
         queryset = self.get_queryset()
         serializer = SalaReunionesSerializer(queryset, many=True, context={'request': request})
         return Response(serializer.data)
-
-
-class ReservaSalaViewSet(BasePermisos):
-    queryset = ReservaSala.objects.all()
-    serializer_class = ReservaSalaSerializer
-
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        sala_id = self.request.query_params.get('sala_id')
-        if sala_id:
-            queryset = queryset.filter(sala_id=sala_id)
-        return queryset
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        sala = serializer.validated_data['sala']
-        fecha_inicio = serializer.validated_data['fecha_inicio']
-        fecha_fin = serializer.validated_data['fecha_fin']
-
-        # Comprobar disponibilidad
-        reservas_existentes = ReservaSala.objects.filter(
-            sala=sala,
-            fecha_inicio__lt=fecha_fin,
-            fecha_fin__gt=fecha_inicio
-        )
-        if reservas_existentes.exists():
-            return Response(
-                {'detail': 'La sala ya está reservada en este intervalo de tiempo.'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-

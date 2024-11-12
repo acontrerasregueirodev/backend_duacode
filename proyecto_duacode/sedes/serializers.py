@@ -1,38 +1,29 @@
 from rest_framework import serializers
-from .models import Sede, SalaReuniones, ReservaSala
-from core.models import Empleado  # Asegúrate de tener la importación correcta de 'Empleado'
-
+from .models import ReservaSala, Sede, SalaReuniones
+from core.models import Empleado  # Importar el modelo de Empleado
 
 class SedeSerializer(serializers.ModelSerializer):
-    # Incluir las salas de reuniones relacionadas con la sede
-    salas = serializers.StringRelatedField(many=True, read_only=True)
-
     class Meta:
         model = Sede
-        fields = ['id', 'nombre', 'direccion', 'ciudad', 'pais', 'salas']
-
-
+        fields = ['id', 'nombre', 'direccion', 'ciudad', 'pais']
+        
+        # Serializer para las salas de reuniones
 class SalaReunionesSerializer(serializers.ModelSerializer):
-    # Mostrar los detalles de la sede relacionada
-    sede = SedeSerializer(read_only=True)
-    # Incluir las reservas de la sala
-    reservas = serializers.StringRelatedField(many=True, read_only=True)
-    # Mostrar si la sala está ocupada usando la propiedad 'is_ocupada'
-    is_ocupada = serializers.ReadOnlyField()
-
     class Meta:
         model = SalaReuniones
-        fields = ['id', 'nombre', 'capacidad', 'sede', 'imagen_url', 'reservas', 'is_ocupada']
-
-
+        fields = ['id', 'nombre', 'capacidad', 'sede', 'imagen_url']
+# Serializer para el modelo ReservaSala
 class ReservaSalaSerializer(serializers.ModelSerializer):
-    # Mostrar los detalles de la sala reservada
-    sala = SalaReunionesSerializer(read_only=True)
-    # Mostrar el nombre del empleado que reservó la sala
-    reservado_por = serializers.StringRelatedField(read_only=True)
-    # Mostrar los asistentes a la reunión
-    empleados_asistentes = serializers.StringRelatedField(many=True, read_only=True)
+    sala = serializers.PrimaryKeyRelatedField(queryset=SalaReuniones.objects.all())
+    reservado_por = serializers.StringRelatedField()
+    empleados_asistentes = serializers.PrimaryKeyRelatedField(queryset=Empleado.objects.all(), many=True)
 
     class Meta:
         model = ReservaSala
-        fields = ['id', 'sala', 'reservado_por', 'fecha_inicio', 'fecha_fin', 'empleados_asistentes']
+        fields = ['id', 'sala', 'reservado_por', 'fecha', 'hora_inicio', 'hora_fin', 'empleados_asistentes']
+    
+    def validate(self, data):
+        if data['hora_inicio'] >= data['hora_fin']:
+            raise serializers.ValidationError("La hora de inicio debe ser anterior a la hora de fin.")
+        return data
+    

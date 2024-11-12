@@ -15,6 +15,6 @@ class SalaReunionesAdmin(admin.ModelAdmin):
 
 @admin.register(ReservaSala)
 class ReservaSalaAdmin(admin.ModelAdmin):
-    list_display = ('id', 'sala', 'fecha_inicio', 'fecha_fin', 'reservado_por')  # Campos a mostrar
-    list_filter = ('sala', 'fecha_inicio')  # Filtros en el panel
-    search_fields = ('sala__nombre', 'reservado_por__nombre')  # Busca por sala o empleado
+    list_display = ('sala', 'reservado_por', 'fecha', 'hora_inicio', 'hora_fin')
+    list_filter = ('fecha',)  # Utiliza el campo 'fecha' en lugar de 'fecha_inicio'
+

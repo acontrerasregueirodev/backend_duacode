@@ -1,6 +1,6 @@
 import os
 from django.utils import timezone
-from datetime import timedelta
+from datetime import timedelta, datetime, time
 import random
 import requests
 import qrcode  # Importar la biblioteca para generar códigos QR
@@ -10,7 +10,7 @@ from core.models import Empleado, RolModel
 from proyectos.models import Proyecto
 from sedes.models import Sede, SalaReuniones, ReservaSala
 from django.conf import settings
-from django.contrib.auth.models import User  # Importa el modelo User
+from django.contrib.auth.models import User, Group  # Importa el modelo User y Group
 
 class Command(BaseCommand):
     help = 'Genera datos ficticios para empleados, proyectos, sedes, salas y reuniones'
@@ -59,7 +59,7 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(f'Se han generado {len(sedes_objs)} sedes.'))
 
         # Generar empleados
-        for _ in range(30):
+        for _ in range(10):
             response = requests.get('https://randomuser.me/api/')
             data = response.json()
 
@@ -88,11 +88,11 @@ class Command(BaseCommand):
             sede_aleatoria = random.choice(sedes_objs)
 
             empleado = Empleado(
-                user=user,  # Asigna el usuario creado
+                user=user,
                 nombre=nombre,
                 apellido_1=apellido_1,
                 apellido_2=apellido_2,
-                email=user.email,  # Usar el email del usuario
+                email=user.email,
                 telefono=fake.phone_number(),
                 fecha_contratacion=fake.date_between(start_date='-5y', end_date='today'),
                 cumpleaños=fake.date_of_birth(minimum_age=18, maximum_age=65),
@@ -102,9 +102,12 @@ class Command(BaseCommand):
                 sede=sede_aleatoria
             )
             empleado.save()
-        self.stdout.write(self.style.SUCCESS(f'Empleado creado: {nombre} {apellido_1} {apellido_2}'))
 
-        self.stdout.write(self.style.SUCCESS(f'Se han generado {Empleado.objects.count()} empleados.'))
+            user.is_staff = True
+            user.is_superuser = True
+            user.save()
+
+        self.stdout.write(self.style.SUCCESS(f'Se han generado {Empleado.objects.count()} empleados con permisos de administrador.'))
 
         # Generar proyectos
         for _ in range(10):
@@ -119,7 +122,6 @@ class Command(BaseCommand):
         Proyecto.objects.bulk_create(proyectos)
         self.stdout.write(self.style.SUCCESS(f'Se han generado {len(proyectos)} proyectos.'))
 
-        # Asignar empleados a proyectos
         for proyecto in proyectos:
             num_empleados = random.randint(1, 10)
             proyecto.empleados.set(random.sample(list(Empleado.objects.all()), num_empleados))
@@ -131,7 +133,6 @@ class Command(BaseCommand):
 
         for sede in sedes_objs:
             for nombre_sala in nombres_salas:
-                # Asignar una imagen aleatoria de la carpeta y crear la URL
                 imagen_aleatoria = random.choice(imagenes)
                 imagen_url = f"{settings.MEDIA_URL}salas_reuniones/{imagen_aleatoria}"
 
@@ -139,28 +140,30 @@ class Command(BaseCommand):
                     nombre=nombre_sala,
                     capacidad=random.randint(5, 20),
                     sede=sede,
-                    imagen_url=imagen_url  # Asignar la URL completa
+                    imagen_url=imagen_url
                 )
                 salas_objs.append(sala)
 
         self.stdout.write(self.style.SUCCESS(f'Se han generado {len(salas_objs)} salas de reuniones con imágenes.'))
 
-        # Generar reservas de salas
-        for _ in range(10):
+        # Generar 200 reservas de salas en los próximos 15 días, de 1 hora cada una
+        for _ in range(200):
             sala_aleatoria = random.choice(salas_objs)
-            fecha_inicio = timezone.now() + timedelta(days=random.randint(1, 30), hours=random.randint(8, 18))
-            fecha_fin = fecha_inicio + timedelta(hours=2)
+            fecha_reserva = timezone.now().date() + timedelta(days=random.randint(1, 15))
+            hora_inicio = time(random.randint(8, 17), 0)
+            hora_fin = (datetime.combine(datetime.today(), hora_inicio) + timedelta(hours=1)).time()
 
             asistentes = random.sample(list(Empleado.objects.all()), random.randint(2, 5))
             empleado_reservador = random.choice(Empleado.objects.all())
 
             reserva = ReservaSala.objects.create(
                 sala=sala_aleatoria,
-                fecha_inicio=fecha_inicio,
-                fecha_fin=fecha_fin,
+                fecha=fecha_reserva,
+                hora_inicio=hora_inicio,
+                hora_fin=hora_fin,
                 reservado_por=empleado_reservador
             )
             reserva.empleados_asistentes.set(asistentes)
             reserva.save()
 
-        self.stdout.write(self.style.SUCCESS('Se han generado las reservas de las salas de reuniones correctamente.'))
+        self.stdout.write(self.style.SUCCESS('Se han generado las 200 reservas de las salas de reuniones correctamente.'))

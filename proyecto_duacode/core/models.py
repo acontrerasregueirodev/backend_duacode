@@ -46,7 +46,7 @@ class Empleado(models.Model):
     is_on_leave = models.BooleanField(default=False)  # Indicador de si está de baja/vacaciones
     foto = models.ImageField(upload_to='empleados/', blank=True, null=True)  # Foto del empleado
     # Relación con Rol
-    rol = models.ForeignKey(RolModel, on_delete=models.CASCADE, default=5)
+    rol = models.ForeignKey(RolModel, on_delete=models.CASCADE)
     # Relación con sede usando el nombre de la clase como cadena
     sede = models.ForeignKey('sedes.Sede', on_delete=models.CASCADE, null=True, blank=True)  # Relación con Sede
 
@@ -55,10 +55,11 @@ class Empleado(models.Model):
 
     def save(self, *args, **kwargs):
         # Generar y guardar el código QR utilizando la función modular
-        qr_file = generate_qr_code(self)
-        self.qr_code.save(f'{self.nombre}_{self.apellido_1}_qr.png', qr_file, save=False)
+        if not self.pk:
+            qr_file = generate_qr_code(self)
+            self.qr_code.save(f'{self.nombre}_{self.apellido_1}_qr.png', qr_file, save=False)
 
-        # Llamar al método save() original para guardar el modelo
+            # Llamar al método save() original para guardar el modelo
         super().save(*args, **kwargs)
 
     def __str__(self):
