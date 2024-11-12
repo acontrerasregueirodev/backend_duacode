@@ -15,12 +15,6 @@ class ReservaSalaViewSet(viewsets.ModelViewSet):
     queryset = ReservaSala.objects.all()
     serializer_class = ReservaSalaSerializer
 
-    # def get_permissions(self):
-    #     if self.action in ['create', 'update','delete']:
-    #         print(IsAuthenticated())
-    #         return [IsAuthenticated()]
-    #     return [AllowAny()]
-
     def get_queryset(self):
         queryset = super().get_queryset()
         fecha = self.request.query_params.get('fecha', None)

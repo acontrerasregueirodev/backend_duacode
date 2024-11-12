@@ -123,11 +123,4 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Uncomment the email configuration if needed
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = 'smtp.pythonanywhere.com'
-# EMAIL_PORT = 587
-# EMAIL_USE_TLS = True
-# EMAIL_HOST_USER = 'belami@pythonanywhere.com'
-# EMAIL_HOST_PASSWORD = 'Figura00+'
-# DEFAULT_FROM_EMAIL = 'contacto@pythonanywhere.com'
+
