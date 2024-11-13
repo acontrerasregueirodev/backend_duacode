@@ -18,6 +18,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
+from core.views import WelcomeView  # Asegúrate de importar tu vista
+
 #from core.views import PanelEmpleadosView
 
 urlpatterns = [
@@ -30,6 +32,7 @@ urlpatterns = [
     path('contacto/', include('contacto.urls')),    
     path('codigo_qr/', include('codigo_qr.urls')),
     path('auth/', include('login.urls')),  # Include login app URLs
+    path('', WelcomeView.as_view(), name='welcome'),  # Ruta raíz del proyecto
     
 
     

@@ -15,8 +15,8 @@ class ProyectoSerializer(serializers.ModelSerializer):
 
 class EmpleadoSerializer(serializers.ModelSerializer):
     proyectos = ProyectoSerializer(many=True, read_only=True)
-    rol = serializers.PrimaryKeyRelatedField(queryset=RolModel.objects.all())
-    
+    #rol = serializers.PrimaryKeyRelatedField(queryset=RolModel.objects.all())
+    rol = RolModelSerializer(read_only=True)  # Cambiado a RolModelSerializer para incluir el nombre del rol
     class Meta:
         model = Empleado
         fields = [

@@ -3,7 +3,19 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import Empleado
 from .serializers import EmpleadoSerializer
 from rest_framework.response import Response 
+from rest_framework.views import APIView
+from django.middleware.csrf import get_token
 
+
+
+
+class WelcomeView(APIView):
+    def get(self, request):
+        csrf_token = get_token(request) # Obtén el token CSRF
+        return Response({            
+            "message": "Bienvenido a Duacode TouchScreen!",
+            "csrfToken": csrf_token  # Incluye el token CSRF en la respuesta
+        })
 
 class EmpleadoViewset(viewsets.ModelViewSet):
     queryset = Empleado.objects.all()
