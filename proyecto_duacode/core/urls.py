@@ -1,12 +1,15 @@
-from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import EmpleadoViewset, WelcomeView
-#from proyectos.views import ProyectoViewSet
+from django.urls import path, include
+from .views import EmpleadoViewset, RolViewSet
 
 router = DefaultRouter()
-router.register(r'', EmpleadoViewset)  # Genera rutas como /api/empleados/
+
+# Rutas para empleados
+router.register(r'empleados', EmpleadoViewset)
+
+# Rutas para roles
+router.register(r'roles', RolViewSet, basename='roles')
 
 urlpatterns = [
-    path('empleado/perfil/', EmpleadoViewset.as_view({'get': 'retrieve', 'put': 'update'}), name='empleado-perfil'),
-    path('', include(router.urls)),
+    path('', include(router.urls)),  # Incluir las rutas de todos los viewsets
 ]
