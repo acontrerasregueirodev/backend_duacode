@@ -1,12 +1,12 @@
 from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from .models import Empleado
-from .serializers import EmpleadoSerializer
+from .models import Empleado, RolModel
+from rest_framework.decorators import action
+from .serializers import EmpleadoSerializer, RolModelSerializer, RolModelListSerializer
 from rest_framework.response import Response 
 from rest_framework.views import APIView
 from django.middleware.csrf import get_token
-
-
+from rest_framework.viewsets import ReadOnlyModelViewSet
 
 
 class WelcomeView(APIView):
@@ -16,7 +16,18 @@ class WelcomeView(APIView):
             "message": "Bienvenido a Duacode TouchScreen!",
             "csrfToken": csrf_token  # Incluye el token CSRF en la respuesta
         })
-
+class RolViewSet(ReadOnlyModelViewSet):
+    """
+    ViewSet para listar y recuperar roles.
+    """
+    queryset = RolModel.objects.all()
+      # Utiliza un método para decidir qué serializador usar
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return RolModelListSerializer  # Usar RolModelListSerializer para /api/roles/
+        return RolModelSerializer  # Usar RolModelSerializer para otros casos
+    # serializer_class = RolModelSerializer
+    
 class EmpleadoViewset(viewsets.ModelViewSet):
     queryset = Empleado.objects.all()
     serializer_class = EmpleadoSerializer
@@ -27,10 +38,19 @@ class EmpleadoViewset(viewsets.ModelViewSet):
         return [AllowAny()]
     
     def create(self, request, *args, **kwargs):
-        print("Datos de creación de empleado recibidos:", request.data)
-        return super().create(request, *args, **kwargs)
+        data = request.data
+        print(data)
+        # rol_id = data.get('rol')
+
+      
+
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, *args, **kwargs):
+        #print("updateeeee")
         instance = self.get_object()  # Obtiene la instancia actual del empleado
         serializer = self.get_serializer(instance, data=request.data, partial=True)
 
@@ -51,3 +71,14 @@ class EmpleadoViewset(viewsets.ModelViewSet):
         except Empleado.DoesNotExist:
             return Response({'error': 'Empleado no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
 
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated], url_path='perfil')
+    def perfil(self, request):
+        """
+        Esta acción personalizada permite que un empleado vea su perfil.
+        """
+        print("vista de perfil")
+        empleado = self.queryset.filter(user=request.user).first()  # Cambiado 'usuario' a 'user'
+        if empleado:
+            serializer = self.get_serializer(empleado)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({'error': 'Empleado no encontrado.'}, status=status.HTTP_404_NOT_FOUND)

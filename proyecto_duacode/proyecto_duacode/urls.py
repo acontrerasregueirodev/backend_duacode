@@ -24,7 +24,8 @@ from core.views import WelcomeView  # Asegúrate de importar tu vista
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/empleados/', include('core.urls')), #Incluimos las rutas de la API para empleados
+    path('api/', include('core.urls')),  # Rutas para empleados
+    # path('api/', include('core.urls')),      # Rutas para roles
     path('api/proyectos/', include('proyectos.urls')),  # Rutas de proyectos
     path('upload/', include('subir_archivo.urls')),  # Asegúrate de que la ruta sea correcta
     path('api/sedes/',include('sedes.urls')),

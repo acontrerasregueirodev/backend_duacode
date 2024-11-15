@@ -5,7 +5,6 @@ from core.models import Empleado  # Import the Empleado model from the empleados
 from core.serializers import EmpleadoSerializer  # Import the serializer if you want nested data
 
 class ProyectoSerializer(serializers.ModelSerializer):
-    empleados = EmpleadoSerializer(many=True, read_only=True)  # Nested if detailed employee data is needed
     
     class Meta:
         model = Proyecto

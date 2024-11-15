@@ -3,10 +3,7 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from rest_framework import serializers
 from .models import Empleado, RolModel
 
-class RolModelSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = RolModel
-        fields = ['id', 'nombre']
+
 
 class ProyectoSerializer(serializers.ModelSerializer):
     class Meta:
@@ -15,8 +12,10 @@ class ProyectoSerializer(serializers.ModelSerializer):
 
 class EmpleadoSerializer(serializers.ModelSerializer):
     proyectos = ProyectoSerializer(many=True, read_only=True)
-    #rol = serializers.PrimaryKeyRelatedField(queryset=RolModel.objects.all())
-    rol = RolModelSerializer(read_only=True)  # Cambiado a RolModelSerializer para incluir el nombre del rol
+    rol = serializers.PrimaryKeyRelatedField(queryset=RolModel.objects.all())
+    #rol = RolModelSerializer()  # Cambiado a RolModelSerializer para incluir el nombre del rol
+    #rol = serializers.CharField(source="rol.nombre", read_only=True)
+
     class Meta:
         model = Empleado
         fields = [
@@ -34,7 +33,11 @@ class EmpleadoSerializer(serializers.ModelSerializer):
             'rol',
             'sede',
         ]
-
+    def validate_is_on_leave(self, value):
+        # Convierte el valor 'false' a False y 'true' a True
+        if isinstance(value, str):
+            return value.lower() == 'true'
+        return value
     def create(self, validated_data):
         empleado = Empleado.objects.create(**validated_data)
         return empleado
@@ -55,4 +58,14 @@ class EmpleadoSerializer(serializers.ModelSerializer):
     
 
 
+class RolModelSerializer(serializers.ModelSerializer):
+    empleados = EmpleadoSerializer(many=True, read_only=True)  # Nested if detailed employee data is needed
+    class Meta:
+        model = RolModel
+        fields = ['id', 'nombre','empleado']
+        
+class RolModelListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RolModel
+        fields = ['id', 'nombre']  # Solo los campos que quieres mostrar en la lista
 
