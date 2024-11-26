@@ -36,10 +36,14 @@ urlpatterns = [
     path('', WelcomeView.as_view(), name='welcome'),  # Ruta raíz del proyecto
     
 
-    
+]
 
-    
-
-]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# Solo en desarrollo, para servir archivos estáticos y multimedia
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) 
+
+    
+
+# ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# if settings.DEBUG:
+#     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

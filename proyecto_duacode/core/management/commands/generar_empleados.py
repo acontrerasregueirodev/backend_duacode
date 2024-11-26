@@ -166,8 +166,9 @@ class Command(BaseCommand):
                 
                 # Descargar la foto
                 foto_response = requests.get(foto_url)
-                foto_nombre = f"{random_rol.nombre.lower().replace(' ', '_')}_foto_{empleados_creados + 1}.jpg"
+                foto_nombre = f"{nombre.lower()}.{apellido.lower()}.jpg"
                 foto_path = os.path.join(settings.MEDIA_ROOT, 'empleados', foto_nombre)
+                print(foto_path)
                 
                 with open(foto_path, 'wb') as f:
                     f.write(foto_response.content)
@@ -198,7 +199,7 @@ class Command(BaseCommand):
                     telefono=telefono,
                     fecha_contratacion=date.today(),
                     cumpleanos=cumpleanos[:10],  # Solo la fecha (yyyy-mm-dd)
-                    foto=foto_nombre,  # Nombre de la foto descargada
+                     foto=f'empleados/{foto_nombre}',  # Nombre de la foto descargada
                     rol=random_rol,
                     sede=None,
                     baja=False,
@@ -212,12 +213,12 @@ class Command(BaseCommand):
 
         # Crear los empleados del escalón más bajo (ya añadido)
         empleados_por_crear_bajo = [
-            ('INGENIERO_FRONTEND', 10),
-            ('INGENIERO_BACKEND', 10),
-            ('INGENIERO_QA', 5),
-            ('ESPECIALISTA_MARKETING', 5),
-            ('ESPECIALISTA_SOPORTE', 5),
-            ('COORDINADOR_PROYECTO', 5),
+            ('INGENIERO_FRONTEND', 2),
+            ('INGENIERO_BACKEND', 2),
+            ('INGENIERO_QA', 2),
+            ('ESPECIALISTA_MARKETING', 2),
+            ('ESPECIALISTA_SOPORTE', 2),
+            ('COORDINADOR_PROYECTO', 2),
             ('PROPIETARIO_PRODUCTO', 2),
         ]
 
@@ -237,9 +238,9 @@ class Command(BaseCommand):
                 
                 # Descargar la foto
                 foto_response = requests.get(foto_url)
-                foto_nombre = f"{random_rol.nombre.lower().replace(' ', '_')}_foto_{empleados_creados + 1}.jpg"
-                foto_path = os.path.join(settings.MEDIA_ROOT, 'empleados', foto_nombre)
-                
+                foto_nombre = f'{nombre.lower()}.{apellido.lower()}.jpg'
+
+                foto_path = os.path.join(settings.MEDIA_ROOT, 'empleados', foto_nombre)                
                 with open(foto_path, 'wb') as f:
                     f.write(foto_response.content)
 
@@ -267,7 +268,7 @@ class Command(BaseCommand):
                     telefono=telefono,
                     fecha_contratacion=date.today(),
                     cumpleanos=cumpleanos[:10],  # Solo la fecha (yyyy-mm-dd)
-                    foto=foto_nombre,  # Nombre de la foto descargada
+                    foto=f'empleados/{foto_nombre}',  # Ruta relativa a la foto
                     rol=random_rol,
                     sede=None,  # Aquí podrías asignar una sede si es necesario
                     baja=random.choice([True, False]),  # Valor aleatorio para baja
