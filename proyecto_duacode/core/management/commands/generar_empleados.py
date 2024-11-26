@@ -11,6 +11,7 @@ from django.contrib.auth.models import User
 from datetime import time, date, timedelta, datetime
 from django.utils import timezone
 
+
 class Command(BaseCommand):
     help = 'Genera datos ficticios para empleados, proyectos, sedes, salas y reuniones'
 
@@ -133,8 +134,8 @@ class Command(BaseCommand):
             supervisor=ceo
         )
 
-        # Crear el resto de los empleados con la jerarquía dada
-        empleados_por_crear = [
+        # Crear los empleados del escalón medio
+        empleados_por_crear_jerarquia = [
             ('LÍDER_DESARROLLO', 3),
             ('LÍDER_QA', 2),
             ('GERENTE_PROYECTO', 2),
@@ -149,7 +150,7 @@ class Command(BaseCommand):
         ]
 
         empleados_creados = 0
-        for rol_nombre, cantidad in empleados_por_crear:
+        for rol_nombre, cantidad in empleados_por_crear_jerarquia:
             random_rol = created_roles[rol_nombre]
             for _ in range(cantidad):
                 # Generar un usuario aleatorio con randomuser.me
@@ -174,9 +175,17 @@ class Command(BaseCommand):
                 # Asignar el supervisor de acuerdo a la jerarquía
                 supervisor_rol = jerarquia.get(random_rol.nombre)
                 if supervisor_rol:
-                    supervisor = Empleado.objects.filter(rol=created_roles[supervisor_rol]).first()
+                    # Filtrar los empleados que ya tienen el rol de supervisor y que no están de baja ni tienen excedencia
+                    posibles_supervisores = Empleado.objects.filter(rol=created_roles[supervisor_rol], baja=False, excedencia=False)
+                    # Elegir uno aleatoriamente
+                    supervisor = posibles_supervisores.order_by('?').first() if posibles_supervisores.exists() else None
                 else:
                     supervisor = None  # Si no tiene supervisor, asignamos None
+
+                # Para los Ingenieros de Backend y Frontend, asignar un Líder de Desarrollo aleatorio
+                if random_rol.nombre in ['INGENIERO_FRONTEND', 'INGENIERO_BACKEND']:
+                    lider_desarrollo = Empleado.objects.filter(rol=created_roles['LÍDER_DESARROLLO']).order_by('?').first()
+                    supervisor = lider_desarrollo
 
                 # Crear el empleado
                 user = User.objects.create_user(username=email.split('@')[0], password='password123', email=email)
@@ -201,8 +210,79 @@ class Command(BaseCommand):
 
                 empleados_creados += 1
 
-        self.stdout.write(self.style.SUCCESS('Empleados jerárquicos generados correctamente.'))
+        # Crear los empleados del escalón más bajo (ya añadido)
+        empleados_por_crear_bajo = [
+            ('INGENIERO_FRONTEND', 10),
+            ('INGENIERO_BACKEND', 10),
+            ('INGENIERO_QA', 5),
+            ('ESPECIALISTA_MARKETING', 5),
+            ('ESPECIALISTA_SOPORTE', 5),
+            ('COORDINADOR_PROYECTO', 5),
+            ('PROPIETARIO_PRODUCTO', 2),
+        ]
 
+        for rol_nombre, cantidad in empleados_por_crear_bajo:
+            random_rol = created_roles[rol_nombre]
+            for _ in range(cantidad):
+                # Generar un usuario aleatorio con randomuser.me
+                response = requests.get('https://randomuser.me/api/')
+                data = response.json()
+                user_info = data['results'][0]
+                nombre = user_info['name']['first']
+                apellido = user_info['name']['last']
+                email = user_info['email']
+                telefono = user_info['phone']
+                cumpleanos = user_info['dob']['date']
+                foto_url = user_info['picture']['large']
+                
+                # Descargar la foto
+                foto_response = requests.get(foto_url)
+                foto_nombre = f"{random_rol.nombre.lower().replace(' ', '_')}_foto_{empleados_creados + 1}.jpg"
+                foto_path = os.path.join(settings.MEDIA_ROOT, 'empleados', foto_nombre)
+                
+                with open(foto_path, 'wb') as f:
+                    f.write(foto_response.content)
+
+                # Asignar el supervisor de acuerdo a la jerarquía
+                supervisor_rol = jerarquia.get(random_rol.nombre)
+                # Asignar el supervisor de acuerdo a la jerarquía de manera aleatoria
+                if supervisor_rol:
+                    # Filtrar los empleados que ya tienen el rol de supervisor y que no están de baja ni tienen excedencia
+                    posibles_supervisores = Empleado.objects.filter(rol=created_roles[supervisor_rol], baja=False, excedencia=False)
+                    # Elegir uno aleatoriamente
+                    supervisor = posibles_supervisores.order_by('?').first() if posibles_supervisores.exists() else None
+                else:
+                    supervisor = None  # Si no tiene supervisor, asignamos None
+
+                # Crear el usuario
+                user = User.objects.create_user(username=email.split('@')[0], password='password123', email=email)
+                
+                # Crear el empleado
+                empleado = Empleado.objects.create(
+                    user=user,
+                    nombre=nombre,
+                    apellido_1=apellido,
+                    apellido_2=apellido,
+                    email=email,
+                    telefono=telefono,
+                    fecha_contratacion=date.today(),
+                    cumpleanos=cumpleanos[:10],  # Solo la fecha (yyyy-mm-dd)
+                    foto=foto_nombre,  # Nombre de la foto descargada
+                    rol=random_rol,
+                    sede=None,  # Aquí podrías asignar una sede si es necesario
+                    baja=False,
+                    excedencia=False,
+                    teletrabajo=False,
+                    vacaciones=False,
+                    supervisor=supervisor  # Asignamos el supervisor si tiene
+                )
+
+                empleados_creados += 1
+
+                self.stdout.write(self.style.SUCCESS(
+                    f'Empleado creado: {empleado.nombre} {empleado.apellido_1} {empleado.apellido_2} | '
+                    f'Rol: {empleado.rol.nombre} | Supervisor: {empleado.supervisor.nombre if empleado.supervisor else "Ninguno"}'
+                ))
         # Generar sedes
         sedes = ['Sede Principal', 'Sede Secundaria', 'Sede Internacional']
         for nombre_sede in sedes:
