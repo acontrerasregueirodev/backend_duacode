@@ -10,10 +10,22 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from datetime import time, date, timedelta, datetime
 from django.utils import timezone
+# Crear una instancia de Faker en español
+fake = Faker('es_ES')
 
+# Función para generar un número de teléfono español válido
+def generar_telefono_espanol():
+    prefijos_moviles = ['6', '7']  # Prefijos para móviles en España
+    prefijos_fijos = ['91', '93', '95']  # Algunos prefijos fijos comunes
+    if random.choice([True, False]):  # 50% de probabilidad de móvil o fijo
+        numero = random.choice(prefijos_moviles) + ''.join([str(random.randint(0, 9)) for _ in range(8)])
+    else:
+        numero = random.choice(prefijos_fijos) + ''.join([str(random.randint(0, 9)) for _ in range(7)])
+    return numero
 
 class Command(BaseCommand):
     help = 'Genera datos ficticios para empleados, proyectos, sedes, salas y reuniones'
+
 
     def handle(self, *args, **kwargs):
         fake = Faker()
@@ -74,18 +86,39 @@ class Command(BaseCommand):
             created_roles[nombre] = rol
 
         # Crear un solo CEO, CTO y CFO
-        ceo_user = User.objects.create_user(username="ceo", password='password123', email="ceo@company.com")
+
+        # Función para descargar y guardar la foto
+        def descargar_foto(nombre_usuario):
+            foto_response = requests.get('https://randomuser.me/api/')
+            foto_data = foto_response.json()
+            foto_url = foto_data['results'][0]['picture']['large']
+            foto_nombre = f"{nombre_usuario.lower().replace('.', '_')}.jpg"
+            foto_path = os.path.join(settings.MEDIA_ROOT, 'empleados', foto_nombre)
+            os.makedirs(os.path.dirname(foto_path), exist_ok=True)
+            with open(foto_path, 'wb') as foto_file:
+                foto_file.write(requests.get(foto_url).content)
+            return f'empleados/{foto_nombre}'
+
+        # Datos del CEO
+        nombre_ceo = "Juan"
+        apellido_1_ceo = "Pérez"
+        email_ceo = "juan.perez@empresa.com"
+        rol_ceo = created_roles['CEO']
+        username_ceo = f"{nombre_ceo.capitalize()}.{apellido_1_ceo.capitalize()}"
+        foto_ceo = descargar_foto(username_ceo)
+
+        ceo_user = User.objects.create_user(username=username_ceo, password='password123', email=email_ceo)
         ceo = Empleado.objects.create(
             user=ceo_user,
-            nombre="Juan",
-            apellido_1="Pérez",
-            apellido_2="Gómez",
-            email="juan.perez@empresa.com",
-            telefono="123456789",  # Número de teléfono
+            nombre=nombre_ceo,
+            apellido_1=apellido_1_ceo,
+            apellido_2=apellido_1_ceo,
+            email=email_ceo,
+            telefono=generar_telefono_espanol(),  # Teléfono español válido
             fecha_contratacion=date.today(),
             cumpleanos=date(1980, 5, 15),
-            foto=None,
-            rol=created_roles['CEO'],
+            foto=foto_ceo,
+            rol=rol_ceo,
             sede=None,
             baja=False,
             excedencia=False,
@@ -93,19 +126,28 @@ class Command(BaseCommand):
             vacaciones=False,
             supervisor=None
         )
+        print(f"CEO creado con username: {username_ceo} y foto: {foto_ceo}")
 
-        cto_user = User.objects.create_user(username="cto", password='password123', email="cto@company.com")
+        # Datos del CTO
+        nombre_cto = "Luis"
+        apellido_1_cto = "Martínez"
+        email_cto = "cto@company.com"
+        rol_cto = created_roles['CTO']
+        username_cto = f"{nombre_cto.capitalize()}.{apellido_1_cto.capitalize()}"
+        foto_cto = descargar_foto(username_cto)
+
+        cto_user = User.objects.create_user(username=username_cto, password='password123', email=email_cto)
         cto = Empleado.objects.create(
             user=cto_user,
-            nombre="Luis",
-            apellido_1="Martínez",
-            apellido_2="Gómez",
-            email="cto@company.com",
-            telefono="987654321",  # Número de teléfono
+            nombre=nombre_cto,
+            apellido_1=apellido_1_cto,
+            apellido_2=apellido_1_cto,
+            email=email_cto,
+            telefono=generar_telefono_espanol(),  # Teléfono español válido
             fecha_contratacion=date.today(),
             cumpleanos=date(1985, 8, 22),
-            foto=None,
-            rol=created_roles['CTO'],
+            foto=foto_cto,
+            rol=rol_cto,
             sede=None,
             baja=False,
             excedencia=False,
@@ -113,19 +155,28 @@ class Command(BaseCommand):
             vacaciones=False,
             supervisor=ceo
         )
+        print(f"CTO creado con username: {username_cto} y foto: {foto_cto}")
 
-        cfo_user = User.objects.create_user(username="cfo", password='password123', email="cfo@company.com")
+        # Datos del CFO
+        nombre_cfo = "Ana"
+        apellido_1_cfo = "López"
+        email_cfo = "cfo@company.com"
+        rol_cfo = created_roles['CFO']
+        username_cfo = f"{nombre_cfo.capitalize()}.{apellido_1_cfo.capitalize()}"
+        foto_cfo = descargar_foto(username_cfo)
+
+        cfo_user = User.objects.create_user(username=username_cfo, password='password123', email=email_cfo)
         cfo = Empleado.objects.create(
             user=cfo_user,
-            nombre="Ana",
-            apellido_1="López",
-            apellido_2="Fernández",
-            email="cfo@company.com",
-            telefono="912345678",  # Número de teléfono
+            nombre=nombre_cfo,
+            apellido_1=apellido_1_cfo,
+            apellido_2=apellido_1_cfo,
+            email=email_cfo,
+            telefono=generar_telefono_espanol(),  # Teléfono español válido
             fecha_contratacion=date.today(),
             cumpleanos=date(1987, 11, 30),
-            foto=None,
-            rol=created_roles['CFO'],
+            foto=foto_cfo,
+            rol=rol_cfo,
             sede=None,
             baja=False,
             excedencia=False,
@@ -133,6 +184,7 @@ class Command(BaseCommand):
             vacaciones=False,
             supervisor=ceo
         )
+        print(f"CFO creado con username: {username_cfo} y foto: {foto_cfo}")
 
         # Crear los empleados del escalón medio
         empleados_por_crear_jerarquia = [
@@ -196,7 +248,7 @@ class Command(BaseCommand):
                     apellido_1=apellido,
                     apellido_2=apellido,
                     email=email,
-                    telefono=telefono,
+                    telefono=generar_telefono_espanol(),  # Teléfono español válido
                     fecha_contratacion=date.today(),
                     cumpleanos=cumpleanos[:10],  # Solo la fecha (yyyy-mm-dd)
                      foto=f'empleados/{foto_nombre}',  # Nombre de la foto descargada
@@ -265,7 +317,7 @@ class Command(BaseCommand):
                     apellido_1=apellido,
                     apellido_2=apellido,
                     email=email,
-                    telefono=telefono,
+                    telefono=generar_telefono_espanol(),  # Teléfono español válido
                     fecha_contratacion=date.today(),
                     cumpleanos=cumpleanos[:10],  # Solo la fecha (yyyy-mm-dd)
                     foto=f'empleados/{foto_nombre}',  # Ruta relativa a la foto
