@@ -270,19 +270,17 @@ class Command(BaseCommand):
                     foto=foto_nombre,  # Nombre de la foto descargada
                     rol=random_rol,
                     sede=None,  # Aquí podrías asignar una sede si es necesario
-                    baja=False,
-                    excedencia=False,
-                    teletrabajo=False,
-                    vacaciones=False,
+                    baja=random.choice([True, False]),  # Valor aleatorio para baja
+                    excedencia=random.choice([True, False]),  # Valor aleatorio para excedencia
+                    teletrabajo=random.choice([True, False]),  # Valor aleatorio para teletrabajo
+                    vacaciones=random.choice([True, False]),  # Valor aleatorio para vacaciones
                     supervisor=supervisor  # Asignamos el supervisor si tiene
                 )
 
                 empleados_creados += 1
 
-                self.stdout.write(self.style.SUCCESS(
-                    f'Empleado creado: {empleado.nombre} {empleado.apellido_1} {empleado.apellido_2} | '
-                    f'Rol: {empleado.rol.nombre} | Supervisor: {empleado.supervisor.nombre if empleado.supervisor else "Ninguno"}'
-                ))
+                self.stdout.write(self.style.SUCCESS('Empleados y roles creados correctamente'))
+
         # Generar sedes
         sedes = ['Sede Principal', 'Sede Secundaria', 'Sede Internacional']
         for nombre_sede in sedes:
