@@ -112,7 +112,7 @@ class Command(BaseCommand):
             user=ceo_user,
             nombre=nombre_ceo,
             apellido_1=apellido_1_ceo,
-            apellido_2=apellido_1_ceo,
+            apellido_2= fake.last_name(),
             email=email_ceo,
             telefono=generar_telefono_espanol(),  # Teléfono español válido
             fecha_contratacion=date.today(),
@@ -246,12 +246,12 @@ class Command(BaseCommand):
                     user=user,
                     nombre=nombre,
                     apellido_1=apellido,
-                    apellido_2=apellido,
+                    apellido_2=fake.last_name(),
                     email=email,
                     telefono=generar_telefono_espanol(),  # Teléfono español válido
                     fecha_contratacion=date.today(),
                     cumpleanos=cumpleanos[:10],  # Solo la fecha (yyyy-mm-dd)
-                     foto=f'empleados/{foto_nombre}',  # Nombre de la foto descargada
+                    foto=f'empleados/{foto_nombre}',  # Nombre de la foto descargada
                     rol=random_rol,
                     sede=None,
                     baja=False,
@@ -315,7 +315,7 @@ class Command(BaseCommand):
                     user=user,
                     nombre=nombre,
                     apellido_1=apellido,
-                    apellido_2=apellido,
+                    apellido_2= fake.last_name(),
                     email=email,
                     telefono=generar_telefono_espanol(),  # Teléfono español válido
                     fecha_contratacion=date.today(),

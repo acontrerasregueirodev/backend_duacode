@@ -2,7 +2,7 @@ from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import Empleado, RolModel
 from rest_framework.decorators import action
-from .serializers import EmpleadoSerializer, RolModelSerializer
+from .serializers import EmpleadoSerializer, RolModelSerializer, OrganigramaSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.middleware.csrf import get_token
@@ -70,3 +70,16 @@ class EmpleadoViewset(viewsets.ModelViewSet):
             serializer = self.get_serializer(empleado)
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response({'error': 'Empleado no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
+
+
+class OrganigramaView(APIView):
+    # permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        """
+        Genera la jerarquía completa del organigrama.
+        """
+        # Obtener el empleado raíz (sin supervisor)
+        empleados_raiz = Empleado.objects.filter(supervisor__isnull=True)
+        serializer = OrganigramaSerializer(empleados_raiz, many=True)
+        return Response(serializer.data, status=200)

@@ -28,3 +28,19 @@ class EmpleadoSerializer(serializers.ModelSerializer):
             supervisor = obj.supervisor
             return f'{supervisor.nombre} {supervisor.apellido_1} {supervisor.apellido_2}'
         return 'No tiene supervisor'
+
+
+class OrganigramaSerializer(serializers.ModelSerializer):
+    # Campo recursivo para los empleados supervisados
+    empleados_supervisados = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Empleado
+        fields = ['id', 'nombre', 'apellido_1', 'apellido_2', 'rol', 'empleados_supervisados']
+
+    def get_empleados_supervisados(self, obj):
+        """
+        Devuelve una lista de empleados supervisados por este empleado.
+        """
+        supervisados = Empleado.objects.filter(supervisor=obj)
+        return OrganigramaSerializer(supervisados, many=True).data
