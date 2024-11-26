@@ -2,68 +2,57 @@ from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import Empleado, RolModel
 from rest_framework.decorators import action
-from .serializers import EmpleadoSerializer, RolModelSerializer, RolModelListSerializer
-from rest_framework.response import Response 
+from .serializers import EmpleadoSerializer, RolModelSerializer
+from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.middleware.csrf import get_token
 from rest_framework.viewsets import ReadOnlyModelViewSet
 
-
 class WelcomeView(APIView):
     def get(self, request):
-        csrf_token = get_token(request) # Obtén el token CSRF
-        return Response({            
+        csrf_token = get_token(request)  # Obtén el token CSRF
+        return Response({
             "message": "Bienvenido a Duacode TouchScreen!",
             "csrfToken": csrf_token  # Incluye el token CSRF en la respuesta
         })
+
 class RolViewSet(ReadOnlyModelViewSet):
     """
     ViewSet para listar y recuperar roles.
     """
     queryset = RolModel.objects.all()
-      # Utiliza un método para decidir qué serializador usar
+
     def get_serializer_class(self):
         if self.action == 'list':
             return RolModelListSerializer  # Usar RolModelListSerializer para /api/roles/
         return RolModelSerializer  # Usar RolModelSerializer para otros casos
-    # serializer_class = RolModelSerializer
-    
+
 class EmpleadoViewset(viewsets.ModelViewSet):
     queryset = Empleado.objects.all()
     serializer_class = EmpleadoSerializer
 
     def get_permissions(self):
-        if self.action in ['create', 'update','partial_update', 'destroy']:
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [IsAuthenticated()]
         return [AllowAny()]
-    
+
     def create(self, request, *args, **kwargs):
         data = request.data
-        print(data)
-        # rol_id = data.get('rol')
-
-      
-
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, *args, **kwargs):
-        #print("updateeeee")
         instance = self.get_object()  # Obtiene la instancia actual del empleado
         serializer = self.get_serializer(instance, data=request.data, partial=True)
 
         if serializer.is_valid():
-            print("Datos validados para guardar:", serializer.validated_data)  # Registro de datos validados
             serializer.save()  # Guarda los cambios en la base de datos
             return Response({'mensaje': 'Empleado actualizado con éxito', 'empleado': serializer.data}, status=status.HTTP_200_OK)
-        else:
-            print("Errores de validación:", serializer.errors)  # Registro de errores de validación
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, pk=None):
-        print("stamos en destro empleados")
         try:
             empleado = Empleado.objects.get(id=pk)
             empleado.delete()
@@ -76,7 +65,6 @@ class EmpleadoViewset(viewsets.ModelViewSet):
         """
         Esta acción personalizada permite que un empleado vea su perfil.
         """
-        print("vista de perfil")
         empleado = self.queryset.filter(user=request.user).first()  # Cambiado 'usuario' a 'user'
         if empleado:
             serializer = self.get_serializer(empleado)

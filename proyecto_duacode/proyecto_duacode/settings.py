@@ -10,10 +10,15 @@ SECRET_KEY = 'django-insecure-fg9l&4x*jdh+1ct_*g4$1r1q9i-gi)@gs998x8olw537p$az7o
 DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
-SESSION_COOKIE_DOMAIN = "localhost"
+# SESSION_COOKIE_DOMAIN = "localhost"
 # CSRF and CORS settings
 CSRF_TRUSTED_ORIGINS = ['http://localhost:3000','http://localhost:8000','https://localhost:3000','https://localhost:8000']
-CORS_ALLOWED_ORIGINS = ['http://localhost:3000', 'http://localhost:8000']
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',  # tu frontend React
+    'http://127.0.0.1:8000',  # tu backend Django
+    'https://localhost:3000',  # si tienes un entorno seguro en local
+    'https://localhost:8000',  # si tienes un entorno seguro en local
+]
 CORS_ALLOW_CREDENTIALS = True  # Permitir que las cookies y credenciales se envíen
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Asegúrate de que esté configurado correctamente
 
@@ -44,6 +49,7 @@ INSTALLED_APPS = [
     'contacto',
     'codigo_qr',
     'login',
+    
 ]
 
 #CSRF_COOKIE_SECURE = False  
@@ -119,7 +125,9 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Carpeta donde se guardarán los archivos estáticos
+
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

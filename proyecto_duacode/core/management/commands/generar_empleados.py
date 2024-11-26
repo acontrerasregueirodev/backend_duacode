@@ -1,16 +1,15 @@
 import os
-from django.utils import timezone
-from datetime import timedelta, datetime, time
 import random
 import requests
-import qrcode  # Importar la biblioteca para generar códigos QR
 from django.core.management.base import BaseCommand
 from faker import Faker
 from core.models import Empleado, RolModel
 from proyectos.models import Proyecto
 from sedes.models import Sede, SalaReuniones, ReservaSala
 from django.conf import settings
-from django.contrib.auth.models import User, Group  # Importa el modelo User y Group
+from django.contrib.auth.models import User
+from datetime import time, date, timedelta, datetime
+from django.utils import timezone
 
 class Command(BaseCommand):
     help = 'Genera datos ficticios para empleados, proyectos, sedes, salas y reuniones'
@@ -26,107 +25,206 @@ class Command(BaseCommand):
         imagenes_path = os.path.join(settings.MEDIA_ROOT, 'salas_reuniones')
         imagenes = [f for f in os.listdir(imagenes_path) if f.endswith('.jpg')]
 
-        # Definir roles y verificar si ya existen
+        # Crear roles con jerarquía
         rol_nombres = [
-            'CEO', 'CTO', 'CFO', 'Líder de Equipo de Desarrollo',
-            'Ingeniero de Frontend', 'Ingeniero de Backend', 'Líder de QA',
-            'Ingeniero de QA', 'Gerente de Proyecto', 'Coordinador de Proyecto',
-            'Gerente de Producto', 'Propietario de Producto', 'Gerente de Marketing',
-            'Especialista en Marketing Digital', 'Gerente de Ventas', 
-            'Representante de Ventas', 'Gerente de Soporte', 
-            'Especialista en Soporte al Cliente'
+            'CEO', 'CTO', 'CFO', 'LÍDER_DESARROLLO', 'INGENIERO_FRONTEND', 'INGENIERO_BACKEND', 
+            'LÍDER_QA', 'INGENIERO_QA', 'GERENTE_PROYECTO', 'COORDINADOR_PROYECTO', 'GERENTE_PRODUCTO',
+            'PROPIETARIO_PRODUCTO', 'GERENTE_MARKETING', 'ESPECIALISTA_MARKETING', 'GERENTE_VENTAS', 
+            'REPRESENTANTE_VENTAS', 'GERENTE_SOPORTE', 'ESPECIALISTA_SOPORTE'
         ]
 
-        roles = []
+        roles = {}
         for nombre in rol_nombres:
             rol, created = RolModel.objects.get_or_create(nombre=nombre)
-            roles.append(rol)
+            roles[nombre] = rol
 
-        self.stdout.write(self.style.SUCCESS(f'Se han generado {len(roles)} roles.'))
+        # Definir la jerarquía de supervisores
+        jerarquia = {
+            'CEO': None,
+            'CTO': 'CEO',
+            'LÍDER_DESARROLLO': 'CTO',
+            'INGENIERO_FRONTEND': 'LÍDER_DESARROLLO',
+            'INGENIERO_BACKEND': 'LÍDER_DESARROLLO',
+            'LÍDER_QA': 'CTO',
+            'INGENIERO_QA': 'LÍDER_QA',
+            'GERENTE_PROYECTO': 'CTO',
+            'COORDINADOR_PROYECTO': 'GERENTE_PROYECTO',
+            'CFO': 'CEO',
+            'GERENTE_PRODUCTO': 'CFO',
+            'PROPIETARIO_PRODUCTO': 'GERENTE_PRODUCTO',
+            'GERENTE_MARKETING': 'CFO',
+            'ESPECIALISTA_MARKETING': 'GERENTE_MARKETING',
+            'GERENTE_VENTAS': 'CFO',
+            'REPRESENTANTE_VENTAS': 'GERENTE_VENTAS',
+            'GERENTE_SOPORTE': 'CFO',
+            'ESPECIALISTA_SOPORTE': 'GERENTE_SOPORTE'
+        }
+
+        # Crear roles jerárquicos
+        created_roles = {}
+        for nombre, supervisor in jerarquia.items():
+            # Asegurar que todos los supervisores existen antes de asignar un rol
+            if supervisor and supervisor not in created_roles:
+                supervisor_rol = RolModel.objects.create(nombre=supervisor)
+                created_roles[supervisor] = supervisor_rol
+
+            # Crear el rol si no existe
+            rol, created = RolModel.objects.get_or_create(nombre=nombre)
+            created_roles[nombre] = rol
+
+        # Crear un solo CEO, CTO y CFO
+        ceo_user = User.objects.create_user(username="ceo", password='password123', email="ceo@company.com")
+        ceo = Empleado.objects.create(
+            user=ceo_user,
+            nombre="Juan",
+            apellido_1="Pérez",
+            apellido_2="Gómez",
+            email="juan.perez@empresa.com",
+            telefono="123456789",  # Número de teléfono
+            fecha_contratacion=date.today(),
+            cumpleanos=date(1980, 5, 15),
+            foto=None,
+            rol=created_roles['CEO'],
+            sede=None,
+            baja=False,
+            excedencia=False,
+            teletrabajo=False,
+            vacaciones=False,
+            supervisor=None
+        )
+
+        cto_user = User.objects.create_user(username="cto", password='password123', email="cto@company.com")
+        cto = Empleado.objects.create(
+            user=cto_user,
+            nombre="Luis",
+            apellido_1="Martínez",
+            apellido_2="Gómez",
+            email="cto@company.com",
+            telefono="987654321",  # Número de teléfono
+            fecha_contratacion=date.today(),
+            cumpleanos=date(1985, 8, 22),
+            foto=None,
+            rol=created_roles['CTO'],
+            sede=None,
+            baja=False,
+            excedencia=False,
+            teletrabajo=False,
+            vacaciones=False,
+            supervisor=ceo
+        )
+
+        cfo_user = User.objects.create_user(username="cfo", password='password123', email="cfo@company.com")
+        cfo = Empleado.objects.create(
+            user=cfo_user,
+            nombre="Ana",
+            apellido_1="López",
+            apellido_2="Fernández",
+            email="cfo@company.com",
+            telefono="912345678",  # Número de teléfono
+            fecha_contratacion=date.today(),
+            cumpleanos=date(1987, 11, 30),
+            foto=None,
+            rol=created_roles['CFO'],
+            sede=None,
+            baja=False,
+            excedencia=False,
+            teletrabajo=False,
+            vacaciones=False,
+            supervisor=ceo
+        )
+
+        # Crear el resto de los empleados con la jerarquía dada
+        empleados_por_crear = [
+            ('LÍDER_DESARROLLO', 3),
+            ('LÍDER_QA', 2),
+            ('GERENTE_PROYECTO', 2),
+            ('GERENTE_PRODUCTO', 1),
+            ('PROPIETARIO_PRODUCTO', 1),
+            ('GERENTE_MARKETING', 2),
+            ('ESPECIALISTA_MARKETING', 2),
+            ('GERENTE_VENTAS', 2),
+            ('REPRESENTANTE_VENTAS', 2),
+            ('GERENTE_SOPORTE', 3),
+            ('ESPECIALISTA_SOPORTE', 2),
+        ]
+
+        empleados_creados = 0
+        for rol_nombre, cantidad in empleados_por_crear:
+            random_rol = created_roles[rol_nombre]
+            for _ in range(cantidad):
+                # Generar un usuario aleatorio con randomuser.me
+                response = requests.get('https://randomuser.me/api/')
+                data = response.json()
+                user_info = data['results'][0]
+                nombre = user_info['name']['first']
+                apellido = user_info['name']['last']
+                email = user_info['email']
+                telefono = user_info['phone']
+                cumpleanos = user_info['dob']['date']
+                foto_url = user_info['picture']['large']
+                
+                # Descargar la foto
+                foto_response = requests.get(foto_url)
+                foto_nombre = f"{random_rol.nombre.lower().replace(' ', '_')}_foto_{empleados_creados + 1}.jpg"
+                foto_path = os.path.join(settings.MEDIA_ROOT, 'empleados', foto_nombre)
+                
+                with open(foto_path, 'wb') as f:
+                    f.write(foto_response.content)
+
+                # Asignar el supervisor de acuerdo a la jerarquía
+                supervisor_rol = jerarquia.get(random_rol.nombre)
+                if supervisor_rol:
+                    supervisor = Empleado.objects.filter(rol=created_roles[supervisor_rol]).first()
+                else:
+                    supervisor = None  # Si no tiene supervisor, asignamos None
+
+                # Crear el empleado
+                user = User.objects.create_user(username=email.split('@')[0], password='password123', email=email)
+                empleado = Empleado.objects.create(
+                    user=user,
+                    nombre=nombre,
+                    apellido_1=apellido,
+                    apellido_2=apellido,
+                    email=email,
+                    telefono=telefono,
+                    fecha_contratacion=date.today(),
+                    cumpleanos=cumpleanos[:10],  # Solo la fecha (yyyy-mm-dd)
+                    foto=foto_nombre,  # Nombre de la foto descargada
+                    rol=random_rol,
+                    sede=None,
+                    baja=False,
+                    excedencia=False,
+                    teletrabajo=False,
+                    vacaciones=False,
+                    supervisor=supervisor  # Asignamos el supervisor
+                )
+
+                empleados_creados += 1
+
+        self.stdout.write(self.style.SUCCESS('Empleados jerárquicos generados correctamente.'))
 
         # Generar sedes
         sedes = ['Sede Principal', 'Sede Secundaria', 'Sede Internacional']
-
         for nombre_sede in sedes:
-            sede = Sede.objects.create(
-                nombre=nombre_sede,
-                direccion=f'Calle {random.randint(1, 100)}',
-                ciudad='Ciudad ' + nombre_sede,
-                pais='País ' + nombre_sede
-            )
+            sede = Sede.objects.create(nombre=nombre_sede, direccion=f"Calle {nombre_sede}")
             sedes_objs.append(sede)
 
-        self.stdout.write(self.style.SUCCESS(f'Se han generado {len(sedes_objs)} sedes.'))
+        self.stdout.write(self.style.SUCCESS('Sedes generadas correctamente.'))
 
-        # Generar empleados
-        for _ in range(10):
-            response = requests.get('https://randomuser.me/api/')
-            data = response.json()
 
-            gender = data['results'][0]['gender']
-            if gender == 'male':
-                nombre = fake.first_name_male()
-            else:
-                nombre = fake.first_name_female()
-
-            photo_url = data['results'][0]['picture']['medium']
-            photo_response = requests.get(photo_url)
-
-            apellido_1 = fake.last_name()
-            apellido_2 = fake.last_name()
-            photo_filename = f'{nombre}_{apellido_1}_{apellido_2}.jpg'
-            photo_path = os.path.join(settings.MEDIA_ROOT, 'empleados', photo_filename)
-
-            with open(photo_path, 'wb') as f:
-                f.write(photo_response.content)
-
-            # Crear un usuario para el empleado
-            username = f"{nombre}.{apellido_1}"
-            user = User.objects.create_user(username=username, email=fake.unique.email(), password='password123')
-
-            rol_aleatorio = random.choice(roles)
-            sede_aleatoria = random.choice(sedes_objs)
-
-            empleado = Empleado(
-                user=user,
-                nombre=nombre,
-                apellido_1=apellido_1,
-                apellido_2=apellido_2,
-                email=user.email,
-                telefono=fake.phone_number(),
-                fecha_contratacion=fake.date_between(start_date='-5y', end_date='today'),
-                cumpleaños=fake.date_of_birth(minimum_age=18, maximum_age=65),
-                is_on_leave=fake.boolean(chance_of_getting_true=20),
-                foto=f'empleados/{photo_filename}',
-                rol=rol_aleatorio,
-                sede=sede_aleatoria
-            )
-            empleado.save()
-
-            user.is_staff = True
-            user.is_superuser = True
-            user.save()
-
-        self.stdout.write(self.style.SUCCESS(f'Se han generado {Empleado.objects.count()} empleados con permisos de administrador.'))
 
         # Generar proyectos
-        for _ in range(10):
-            proyecto = Proyecto(
-                nombre=fake.company(),
-                descripcion=fake.paragraph(),
-                fecha_inicio=fake.date_between(start_date='-2y', end_date='today'),
-                fecha_fin=fake.date_between(start_date='today', end_date='+1y') if random.choice([True, False]) else None
+        for i in range(1, 6):
+            proyecto = Proyecto.objects.create(
+                nombre=f'Proyecto {i}',
+                descripcion=f'Descripción del proyecto {i}',
+                fecha_inicio=date.today(),
+                fecha_fin=date.today() + timedelta(days=30)
             )
             proyectos.append(proyecto)
 
-        Proyecto.objects.bulk_create(proyectos)
-        self.stdout.write(self.style.SUCCESS(f'Se han generado {len(proyectos)} proyectos.'))
+        self.stdout.write(self.style.SUCCESS('Proyectos generados correctamente.'))
 
-        for proyecto in proyectos:
-            num_empleados = random.randint(1, 10)
-            proyecto.empleados.set(random.sample(list(Empleado.objects.all()), num_empleados))
-
-        self.stdout.write(self.style.SUCCESS('Se han asignado empleados a los proyectos.'))
 
         # Generar salas de reuniones y asignarles imágenes
         nombres_salas = ['Sala 1', 'Sala 2', 'Sala 3']
@@ -146,7 +244,7 @@ class Command(BaseCommand):
 
         self.stdout.write(self.style.SUCCESS(f'Se han generado {len(salas_objs)} salas de reuniones con imágenes.'))
 
-        # Generar 200 reservas de salas en los próximos 15 días, de 1 hora cada una
+                # Generar 200 reservas de salas en los próximos 15 días, de 1 hora cada una
         for _ in range(200):
             sala_aleatoria = random.choice(salas_objs)
             fecha_reserva = timezone.now().date() + timedelta(days=random.randint(1, 15))
