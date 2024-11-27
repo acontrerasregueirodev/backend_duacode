@@ -265,13 +265,13 @@ class Command(BaseCommand):
 
         # Crear los empleados del escalón más bajo (ya añadido)
         empleados_por_crear_bajo = [
-            ('INGENIERO_FRONTEND', 2),
-            ('INGENIERO_BACKEND', 2),
-            ('INGENIERO_QA', 2),
-            ('ESPECIALISTA_MARKETING', 2),
-            ('ESPECIALISTA_SOPORTE', 2),
-            ('COORDINADOR_PROYECTO', 2),
-            ('PROPIETARIO_PRODUCTO', 2),
+            ('INGENIERO_FRONTEND', 30),
+            ('INGENIERO_BACKEND', 25),
+            ('INGENIERO_QA', 20),
+            ('ESPECIALISTA_MARKETING', 10),
+            ('ESPECIALISTA_SOPORTE', 8),
+            ('COORDINADOR_PROYECTO', 10),
+            ('PROPIETARIO_PRODUCTO', 8),
         ]
 
         for rol_nombre, cantidad in empleados_por_crear_bajo:

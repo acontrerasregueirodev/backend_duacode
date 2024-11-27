@@ -30,17 +30,19 @@ class EmpleadoSerializer(serializers.ModelSerializer):
         return 'No tiene supervisor'
 
 
+# Serializer con formato para React_OrgChart
 class OrganigramaSerializer(serializers.ModelSerializer):
     # Campo recursivo para los empleados supervisados
-    empleados_supervisados = serializers.SerializerMethodField()
+    children = serializers.SerializerMethodField() # Campo personalizado obtenido de get_children
+    rol = RolModelSerializer()
 
     class Meta:
         model = Empleado
-        fields = ['id', 'nombre', 'apellido_1', 'apellido_2', 'rol', 'empleados_supervisados']
+        fields = ['id', 'nombre', 'apellido_1', 'apellido_2', 'rol', 'children', 'foto']
 
-    def get_empleados_supervisados(self, obj):
+    def get_children(self, obj):
         """
-        Devuelve una lista de empleados supervisados por este empleado.
+        Devuelve una lista de empleados supervisados por este empleado en el formato esperado.
         """
         supervisados = Empleado.objects.filter(supervisor=obj)
         return OrganigramaSerializer(supervisados, many=True).data
