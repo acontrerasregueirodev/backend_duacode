@@ -44,5 +44,6 @@ class OrganigramaSerializer(serializers.ModelSerializer):
         """
         Devuelve una lista de empleados supervisados por este empleado en el formato esperado.
         """
+        # Realiza una consulta a la base de datos para obtener todos los empleados que tienen como supervisor al empleado actual (obj).
         supervisados = Empleado.objects.filter(supervisor=obj)
         return OrganigramaSerializer(supervisados, many=True).data

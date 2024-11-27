@@ -2,12 +2,18 @@ from rest_framework import serializers
 from .models import ReservaSala, Sede, SalaReuniones
 from core.models import Empleado  # Importar el modelo de Empleado
 
+
+class EmpleadoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Empleado
+        fields = ['id', 'nombre', 'apellido_1', 'apellido_2', 'email']
+
 class SedeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sede
         fields = ['id', 'nombre', 'direccion', 'ciudad', 'pais']
         
-        # Serializer para las salas de reuniones
+# Serializer para las salas de reuniones
 class SalaReunionesSerializer(serializers.ModelSerializer):
     class Meta:
         model = SalaReuniones
@@ -16,7 +22,7 @@ class SalaReunionesSerializer(serializers.ModelSerializer):
 class ReservaSalaSerializer(serializers.ModelSerializer):
     sala = serializers.PrimaryKeyRelatedField(queryset=SalaReuniones.objects.all())
     reservado_por = serializers.StringRelatedField()
-    empleados_asistentes = serializers.PrimaryKeyRelatedField(queryset=Empleado.objects.all(), many=True)
+    empleados_asistentes = serializers.SerializerMethodField()  # SerializerMethodField para empleados_asistentes
 
     class Meta:
         model = ReservaSala
@@ -27,3 +33,11 @@ class ReservaSalaSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("La hora de inicio debe ser anterior a la hora de fin.")
         return data
     
+    def get_empleados_asistentes(self, obj):
+        """
+        Devuelve los datos de los empleados asistentes a la reunión.
+        """
+        # Accede al campo `empleados_asistentes` de la instancia (obj)
+        empleados = obj.empleados_asistentes.all()  # Suponiendo que sea una relación ManyToMany
+        # Serializa los datos de los empleados asistentes
+        return EmpleadoSerializer(empleados, many=True).data
