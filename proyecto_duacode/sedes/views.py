@@ -6,6 +6,7 @@ from .models import ReservaSala, Sede, SalaReuniones
 from core.models import Empleado
 from .serializers import ReservaSalaSerializer, SedeSerializer, SalaReunionesSerializer
 from rest_framework.exceptions import NotFound
+from rest_framework.generics import ListAPIView
 
 class SedeViewSet(viewsets.ModelViewSet):
     queryset = Sede.objects.all()  # Recuperar todas las sedes
@@ -70,6 +71,7 @@ class SalaReunionesViewSet(viewsets.ModelViewSet):
     queryset = SalaReuniones.objects.all()
     serializer_class = SalaReunionesSerializer
 
+    
     def get_permissions(self):
         """
         Devuelve los permisos basados en la acción que se esté realizando.
@@ -92,3 +94,23 @@ class SalaReunionesViewSet(viewsets.ModelViewSet):
         queryset = self.get_queryset()
         serializer = SalaReunionesSerializer(queryset, many=True, context={'request': request})
         return Response(serializer.data)
+
+class SalaReunionesReservaSerializer(SalaReunionesSerializer):
+    reservas = ReservaSalaSerializer(many=True)
+
+    class Meta:
+        model = SalaReuniones
+        fields = ['id', 'nombre', 'capacidad', 'sede', 'imagen_url', 'reservas']
+    
+class SalaReunionesReservaListView(ListAPIView):
+    queryset = SalaReuniones.objects.all()
+    serializer_class = SalaReunionesSerializer
+    
+    def get_queryset(self):
+        """
+        Filtra las salas de reuniones según el ID de la sala, si se pasa como parámetro.
+        """
+        sala_id = self.kwargs.get('sala_id')
+        if sala_id:
+            return SalaReuniones.objects.filter(id=sala_id)
+        return SalaReuniones.objects.all()   

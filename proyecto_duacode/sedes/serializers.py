@@ -1,8 +1,6 @@
 from rest_framework import serializers
 from .models import ReservaSala, Sede, SalaReuniones
 from core.models import Empleado  # Importar el modelo de Empleado
-
-
 class EmpleadoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Empleado
@@ -15,9 +13,20 @@ class SedeSerializer(serializers.ModelSerializer):
         
 # Serializer para las salas de reuniones
 class SalaReunionesSerializer(serializers.ModelSerializer):
+    reservas = serializers.SerializerMethodField()  # Para incluir las reservas asociadas a la sala
     class Meta:
         model = SalaReuniones
-        fields = ['id', 'nombre', 'capacidad', 'sede', 'imagen_url']
+        fields = ['id', 'nombre', 'capacidad', 'sede', 'imagen_url','reservas']
+        
+    def get_reservas(self, obj):
+        """
+        Devuelve las reservas asociadas a esta sala.
+        """
+        # Accede a todas las reservas asociadas con la sala
+        reservas = ReservaSala.objects.filter(sala=obj)
+        # Serializa las reservas
+        return ReservaSalaSerializer(reservas, many=True).data
+        
 # Serializer para el modelo ReservaSala
 class ReservaSalaSerializer(serializers.ModelSerializer):
     sala = serializers.PrimaryKeyRelatedField(queryset=SalaReuniones.objects.all())

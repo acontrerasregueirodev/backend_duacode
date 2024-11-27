@@ -33,3 +33,6 @@ media/codigo_qr/*
 
 # Archivos de base de datos
 *.sqlite3
+
+# Archivos estáticos
+/staticfiles/
