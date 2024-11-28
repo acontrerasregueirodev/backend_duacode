@@ -73,13 +73,39 @@ class EmpleadoViewset(viewsets.ModelViewSet):
 
 
 class OrganigramaView(APIView):
-    # permission_classes = [IsAuthenticated]
-
     def get(self, request):
         """
-        Genera la jerarquía completa del organigrama.
+        Genera la jerarquía completa del organigrama, incluyendo parentId.
         """
-        # Obtener el empleado raíz (sin supervisor)
-        empleados_raiz = Empleado.objects.filter(supervisor__isnull=True)
-        serializer = OrganigramaSerializer(empleados_raiz, many=True)
-        return Response(serializer.data, status=200)
+        empleados = Empleado.objects.all()
+
+        # Crear un diccionario de empleados para acceder a ellos por su ID
+        empleados_dict = {empleado.id: empleado for empleado in empleados}
+        
+        # Función para construir la jerarquía con parentId
+        def build_hierarchy(empleado):
+            # Crear el diccionario de un empleado
+            emp_data = {
+                'id': empleado.id,
+                'name': empleado.nombre,
+                'title': empleado.rol.nombre if empleado.rol else 'Sin Rol',
+                'parentId': empleado.supervisor.id if empleado.supervisor else None
+            }
+            
+            # Encontrar y agregar a los hijos (empleados supervisados)
+            children = []
+            for e in empleados:
+                if e.supervisor == empleado:
+                    children.append(build_hierarchy(e))  # Recursión para los hijos
+            if children:
+                emp_data['children'] = children
+            
+            return emp_data
+
+        # Buscar empleados raíz (aquellos sin supervisor)
+        empleados_raiz = [empleado for empleado in empleados if empleado.supervisor is None]
+
+        # Construir la jerarquía
+        organigrama_data = [build_hierarchy(empleado) for empleado in empleados_raiz]
+
+        return Response(organigrama_data, status=200)

@@ -15,7 +15,7 @@ class SedeSerializer(serializers.ModelSerializer):
 # Serializer para las salas de reuniones
 class SalaReunionesSerializer(serializers.ModelSerializer):
     reservas = serializers.SerializerMethodField()  # Para incluir las reservas asociadas a la sala
-
+    sede = SedeSerializer() #Mostrar todos los datos de la sede
     class Meta:
         model = SalaReuniones
         fields = ['id', 'nombre', 'capacidad', 'sede', 'imagen_url', 'reservas']
