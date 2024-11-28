@@ -75,37 +75,24 @@ class EmpleadoViewset(viewsets.ModelViewSet):
 class OrganigramaView(APIView):
     def get(self, request):
         """
-        Genera la jerarquía completa del organigrama, incluyendo parentId.
+        Genera la jerarquía del organigrama, incluyendo solo parentId para todos los empleados.
         """
         empleados = Empleado.objects.all()
 
-        # Crear un diccionario de empleados para acceder a ellos por su ID
-        empleados_dict = {empleado.id: empleado for empleado in empleados}
-        
-        # Función para construir la jerarquía con parentId
+        # Función para construir la jerarquía solo con parentId
         def build_hierarchy(empleado):
             # Crear el diccionario de un empleado
             emp_data = {
                 'id': empleado.id,
-                'name': empleado.nombre,
-                'title': empleado.rol.nombre if empleado.rol else 'Sin Rol',
+                'nombre': empleado.nombre,
+                'apellido_1': empleado.apellido_1,
+                'puesto': empleado.rol.nombre if empleado.rol else 'Sin Rol',
+                'foto': empleado.foto.url if empleado.foto else None,
                 'parentId': empleado.supervisor.id if empleado.supervisor else None
             }
-            
-            # Encontrar y agregar a los hijos (empleados supervisados)
-            children = []
-            for e in empleados:
-                if e.supervisor == empleado:
-                    children.append(build_hierarchy(e))  # Recursión para los hijos
-            if children:
-                emp_data['children'] = children
-            
             return emp_data
 
-        # Buscar empleados raíz (aquellos sin supervisor)
-        empleados_raiz = [empleado for empleado in empleados if empleado.supervisor is None]
-
-        # Construir la jerarquía
-        organigrama_data = [build_hierarchy(empleado) for empleado in empleados_raiz]
+        # Construir la jerarquía, solo con parentId para todos los empleados
+        organigrama_data = [build_hierarchy(empleado) for empleado in empleados]
 
         return Response(organigrama_data, status=200)
