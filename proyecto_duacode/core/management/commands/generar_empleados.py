@@ -374,14 +374,26 @@ class Command(BaseCommand):
                 salas_objs.append(sala)
 
         self.stdout.write(self.style.SUCCESS(f'Se han generado {len(salas_objs)} salas de reuniones con imágenes.'))
+        # Crear reservas de salas
+        # Generar 200 reservas de salas en los próximos 15 días, de 1 hora cada una
 
-                # Generar 200 reservas de salas en los próximos 15 días, de 1 hora cada una
+        motivos = [
+            'Reunión con cliente', 
+            'Revisión de proyecto', 
+            'Reunión de equipo', 
+            'Llamada de ventas', 
+            'Taller de formación'
+        ]
+
         for _ in range(200):
             sala_aleatoria = random.choice(salas_objs)
             fecha_reserva = timezone.now().date() + timedelta(days=random.randint(1, 15))
             hora_inicio = time(random.randint(8, 17), 0)
             hora_fin = (datetime.combine(datetime.today(), hora_inicio) + timedelta(hours=1)).time()
-
+            
+            # No sobrescribir la lista, solo seleccionar un motivo aleatorio
+            motivo_aleatorio = random.choice(motivos)
+            
             asistentes = random.sample(list(Empleado.objects.all()), random.randint(2, 5))
             empleado_reservador = random.choice(Empleado.objects.all())
 
@@ -390,7 +402,8 @@ class Command(BaseCommand):
                 fecha=fecha_reserva,
                 hora_inicio=hora_inicio,
                 hora_fin=hora_fin,
-                reservado_por=empleado_reservador
+                reservado_por=empleado_reservador,
+                motivo=motivo_aleatorio  
             )
             reserva.empleados_asistentes.set(asistentes)
             reserva.save()
