@@ -10,7 +10,6 @@ class CodigoQR(models.Model):
 class CodigoEscaneado(models.Model):
     codigo = models.CharField(max_length=255)
     fecha_escaneo = models.DateTimeField(auto_now_add=True)
-    usuario = models.CharField(max_length=100, blank=True)  # Opcional, para registrar quién escaneó
-
+    usuario = models.CharField(max_length=100, blank=True) 
     def __str__(self):
         return f"{self.codigo} escaneado el {self.fecha_escaneo}"

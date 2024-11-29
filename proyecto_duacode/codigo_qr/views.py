@@ -4,12 +4,7 @@ from django.shortcuts import redirect,render
 from django.conf import settings
 #from django.shortcuts import render
 from .models import CodigoQR
-
 import qrcode
-
-
-
-# codigo_qr/views.py
 
 # Vista para escanear códigos QR
 def scan(request):
