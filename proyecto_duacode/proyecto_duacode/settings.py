@@ -29,7 +29,14 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Aseg√∫rate de que est√
 # ]
 CORS_ALLOW_ALL_ORIGINS = True
 
-
+CORS_ALLOW_METHODS = [
+    'GET',
+    'POST',
+    'PUT',
+    'PATCH',
+    'DELETE',
+    'OPTIONS',
+]
 
 # Installed apps
 INSTALLED_APPS = [
@@ -52,8 +59,8 @@ INSTALLED_APPS = [
     
 ]
 
-#CSRF_COOKIE_SECURE = False  
 LOGOUT_REDIRECT_URL = '/'
+
 
 # Middleware
 MIDDLEWARE = [

@@ -1,5 +1,6 @@
 from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from sedes.models import Sede
 from .models import Empleado, RolModel
 from rest_framework.decorators import action
 from .serializers import EmpleadoSerializer, RolModelSerializer, OrganigramaSerializer
@@ -7,7 +8,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.middleware.csrf import get_token
 from rest_framework.viewsets import ReadOnlyModelViewSet
-
+from rest_framework.decorators import api_view
+import json
 class WelcomeView(APIView):
     def get(self, request):
         csrf_token = get_token(request)  # Obtén el token CSRF
@@ -43,15 +45,49 @@ class EmpleadoViewset(viewsets.ModelViewSet):
         self.perform_create(serializer)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+
     def update(self, request, *args, **kwargs):
-        instance = self.get_object()  # Obtiene la instancia actual del empleado
-        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        # Recuperar el objeto empleado desde la base de datos
+        empleado = self.get_object()
 
-        if serializer.is_valid():
-            serializer.save()  # Guarda los cambios en la base de datos
-            return Response({'mensaje': 'Empleado actualizado con éxito', 'empleado': serializer.data}, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # Obtener los datos del request
+        data = request.data
 
+        # Asegurarse de deserializar el campo 'rol'
+        try:
+            rol_data = json.loads(data.get('rol', '{}'))  # Deserializar el JSON
+            rol_id = rol_data.get('id')  # Acceder al campo 'id'
+        except json.JSONDecodeError:
+            return Response({"detail": "El campo 'rol' no es válido."}, status=400)
+
+        # Asignar el valor de 'sede' como una instancia de Sede
+        sede_id = data.get('sede')
+        if sede_id:
+            try:
+                sede = Sede.objects.get(id=sede_id)  # Obtener la instancia de Sede
+            except Sede.DoesNotExist:
+                return Response({"detail": "La sede especificada no existe."}, status=400)
+        else:
+            return Response({"detail": "El campo 'sede' es obligatorio."}, status=400)
+        # Actualizar el empleado con los nuevos datos
+        empleado.nombre = data.get('nombre')
+        empleado.apellido_1 = data.get('apellido_1')
+        empleado.apellido_2 = data.get('apellido_2')
+        empleado.email = data.get('email')
+        empleado.telefono = data.get('telefono')
+        empleado.rol_id = rol_id  # Actualizar el rol con el id deserializado
+        empleado.sede = sede
+        empleado.baja = data.get('baja') == 'true'
+        empleado.excedencia = data.get('excedencia') == 'true'
+        empleado.teletrabajo = data.get('teletrabajo') == 'true'
+        empleado.vacaciones = data.get('vacaciones') == 'false'
+
+        # Guardar el empleado actualizado
+        empleado.save()
+
+        return Response(EmpleadoSerializer(empleado).data)
+
+        
     def destroy(self, request, pk=None):
         try:
             empleado = Empleado.objects.get(id=pk)

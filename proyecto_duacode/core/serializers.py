@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Empleado, RolModel
+import json
 
 class RolModelSerializer(serializers.ModelSerializer):
     class Meta:
@@ -7,6 +8,8 @@ class RolModelSerializer(serializers.ModelSerializer):
         fields = ['id', 'nombre']
 
 class EmpleadoSerializer(serializers.ModelSerializer):
+    foto = serializers.CharField(required=False)  # Aceptar una URL en lugar de un archivo
+    qr_code = serializers.CharField(required=False)  # Aceptar una URL en lugar de un archivo
     # Incluir el serializer del rol
     rol = RolModelSerializer()
     # Para incluir el supervisor, que se obtiene a través del modelo Empleado
@@ -28,6 +31,52 @@ class EmpleadoSerializer(serializers.ModelSerializer):
             supervisor = obj.supervisor
             return f'{supervisor.nombre} {supervisor.apellido_1} {supervisor.apellido_2}'
         return 'No tiene supervisor'
+    
+
+
+    def update(self, instance, validated_data):
+        try:
+            # Extraemos los datos relacionados con 'rol' y 'supervisor' de validated_data
+            rol_data = validated_data.pop('rol', None)
+            supervisor_data = validated_data.pop('supervisor', None)
+
+            # Si 'rol' es una cadena (JSON como string), la deserializamos
+            if rol_data and isinstance(rol_data, str):
+                try:
+                    rol_data = json.loads(rol_data)
+                    print("Rol deserializado correctamente.")
+                except json.JSONDecodeError as e:
+                    print(f"Error al deserializar el rol: {e}")
+                    raise ValueError("Error al deserializar el rol")
+
+            # Si hay datos de rol, actualizamos el rol
+            if rol_data:
+                rol_instance = instance.rol
+                for attr, value in rol_data.items():
+                    setattr(rol_instance, attr, value)
+                rol_instance.save()
+                print(f"Rol actualizado: {rol_instance}")
+
+            # Si se pasó un supervisor, actualizamos
+            if supervisor_data:
+                instance.supervisor = supervisor_data
+                print(f"Supervisor actualizado: {supervisor_data}")
+
+            # Actualizamos el resto de los campos del empleado
+            for attr, value in validated_data.items():
+                setattr(instance, attr, value)
+                print(f"Campo {attr} actualizado con valor {value}")
+
+            # Guardamos los cambios
+            instance.save()
+            print(f"Empleado {instance.nombre} actualizado correctamente.")
+            return instance
+
+        except Exception as e:
+            # En caso de error, lo mostramos en consola
+            print(f"Error al actualizar el empleado: {e}")
+            raise e  # Volvemos a lanzar la excepción para que Django maneje el error
+
 
 
 # Serializer con formato para React_OrgChart
