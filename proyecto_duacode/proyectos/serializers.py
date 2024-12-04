@@ -6,6 +6,9 @@ from core.serializers import EmpleadoSerializer  # Import the serializer if you 
 
 class ProyectoSerializer(serializers.ModelSerializer):
     
+    # Personalizar los campos de fechas
+    fecha_inicio = serializers.DateField(format="%d-%m-%Y")  # Formatear la fecha
+    fecha_fin = serializers.DateField(format="%d-%m-%Y")  # Formatear la fecha
     class Meta:
         model = Proyecto
         fields = ['id', 'nombre', 'descripcion', 'fecha_inicio', 'fecha_fin', 'empleados']
