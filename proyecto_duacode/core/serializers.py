@@ -22,7 +22,9 @@ class EmpleadoSerializer(serializers.ModelSerializer):
 
     # Para incluir el supervisor, que se obtiene a través del modelo Empleado
     supervisor = serializers.SerializerMethodField()
-
+    # Personalizar los campos de fechas
+    fecha_contratacion = serializers.DateField(format="%d-%m-%Y")  # Formatear la fecha
+    cumpleanos = serializers.DateField(format="%d-%m-%Y")  # Formatear la fecha
     class Meta:
         model = Empleado
         fields = [
