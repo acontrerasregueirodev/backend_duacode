@@ -3,15 +3,23 @@ from .models import Empleado, RolModel
 import json
 
 class RolModelSerializer(serializers.ModelSerializer):
+    rol_display = serializers.SerializerMethodField()
     class Meta:
         model = RolModel
-        fields = ['id', 'nombre']
+        fields = ['id', 'nombre','rol_display']
 
+    def get_rol_display(self,obj):
+        # Mapea los códigos a sus nombres legibles
+        rol_map = dict(RolModel.ROL_CHOICES)
+        return rol_map.get(obj.nombre, obj.nombre)  # Devuelve el nombre legible o el valor en caso de no encontrarlo
+        
 class EmpleadoSerializer(serializers.ModelSerializer):
     foto = serializers.CharField(required=False)  # Aceptar una URL en lugar de un archivo
     qr_code = serializers.CharField(required=False)  # Aceptar una URL en lugar de un archivo
     # Incluir el serializer del rol
-    rol = RolModelSerializer()
+    rol = RolModelSerializer()    
+    rol_display = serializers.CharField(source='rol.rol_display', read_only=True)  # Añadir el nombre legible del rol
+
     # Para incluir el supervisor, que se obtiene a través del modelo Empleado
     supervisor = serializers.SerializerMethodField()
 
