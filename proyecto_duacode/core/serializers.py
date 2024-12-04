@@ -27,7 +27,7 @@ class EmpleadoSerializer(serializers.ModelSerializer):
         model = Empleado
         fields = [
             'id', 'nombre', 'apellido_1', 'apellido_2', 'email', 'telefono', 'fecha_contratacion',
-            'cumpleanos', 'foto', 'rol', 'sede', 'baja', 'excedencia', 'teletrabajo', 'vacaciones', 'qr_code',
+            'cumpleanos', 'foto', 'rol','rol_display', 'sede', 'baja', 'excedencia', 'teletrabajo', 'vacaciones', 'qr_code',
             'supervisor'
         ]
     
