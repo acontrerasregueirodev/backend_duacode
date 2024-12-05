@@ -5,7 +5,7 @@ from core.models import Empleado  # Importar el modelo de Empleado
 class EmpleadoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Empleado
-        fields = ['id', 'nombre', 'apellido_1', 'apellido_2', 'email']
+        fields = ['id', 'nombre', 'apellido_1', 'apellido_2', 'email', 'foto']
 
 class SedeSerializer(serializers.ModelSerializer):
     class Meta:
