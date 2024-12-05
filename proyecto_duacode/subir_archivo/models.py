@@ -7,7 +7,7 @@ class SubirArchivo(models.Model):
     uploaded_at = models.DateTimeField(auto_now_add=True) #Guardamos cuando se ha subido el fichero
 
     def __str__(self):
-        return self.file.titulo
+        return self.titulo
 
     class Meta:
         db_table = 'subir_archivo'  # Especifica el nombre de la tabla
