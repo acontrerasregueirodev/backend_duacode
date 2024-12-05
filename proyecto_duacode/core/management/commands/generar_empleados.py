@@ -97,15 +97,28 @@ class Command(BaseCommand):
         # Crear un solo CEO, CTO y CFO
 
         # Función para descargar y guardar la foto
-        def descargar_foto(nombre_usuario):
-            foto_response = requests.get('https://randomuser.me/api/')
+        def descargar_foto(nombre_usuario, genero):
+            # Validar que el género sea "hombre" o "mujer"
+            if genero not in ['hombre', 'mujer']:
+                raise ValueError("El género debe ser 'hombre' o 'mujer'.")
+
+            # Realizar la solicitud a la API con el género especificado
+            foto_response = requests.get(f'https://randomuser.me/api/?gender={"male" if genero == "hombre" else "female"}')
             foto_data = foto_response.json()
             foto_url = foto_data['results'][0]['picture']['large']
+
+            # Construir el nombre del archivo y la ruta
             foto_nombre = f"{nombre_usuario.lower().replace('.', '_')}.jpg"
             foto_path = os.path.join(settings.MEDIA_ROOT, 'empleados', foto_nombre)
+
+            # Crear el directorio si no existe
             os.makedirs(os.path.dirname(foto_path), exist_ok=True)
+
+            # Descargar y guardar la foto
             with open(foto_path, 'wb') as foto_file:
                 foto_file.write(requests.get(foto_url).content)
+
+            # Devolver la ruta relativa
             return f'empleados/{foto_nombre}'
 
         # Datos del CEO
@@ -114,14 +127,17 @@ class Command(BaseCommand):
         email_ceo = "juan.perez@empresa.com"
         rol_ceo = created_roles['CEO']
         username_ceo = f"{nombre_ceo.capitalize()}.{apellido_1_ceo.capitalize()}"
-        foto_ceo = descargar_foto(username_ceo)
+        genero_ceo = "hombre"  # Define el género del CEO
+        foto_ceo = descargar_foto(username_ceo, genero_ceo)
         sede_ceo = random.choice(sedes_objs)
+
+        # Crear usuario y empleado
         ceo_user = User.objects.create_user(username=username_ceo, password='password123', email=email_ceo)
         ceo = Empleado.objects.create(
             user=ceo_user,
             nombre=nombre_ceo,
             apellido_1=apellido_1_ceo,
-            apellido_2= fake.last_name(),
+            apellido_2=fake.last_name(),
             email=email_ceo,
             telefono=generar_telefono_espanol(),  # Teléfono español válido
             fecha_contratacion=date.today(),
@@ -135,7 +151,8 @@ class Command(BaseCommand):
             vacaciones=False,
             supervisor=None
         )
-        print(f"CEO creado con username: {username_ceo} y foto: {foto_ceo}")
+
+        print(f"CEO creado con username: {username_ceo}, foto: {foto_ceo}, género: {genero_ceo}")
 
         # Datos del CTO
         nombre_cto = "Luis"
@@ -143,8 +160,10 @@ class Command(BaseCommand):
         email_cto = "cto@company.com"
         rol_cto = created_roles['CTO']
         username_cto = f"{nombre_cto.capitalize()}.{apellido_1_cto.capitalize()}"
-        foto_cto = descargar_foto(username_cto)
+        foto_cto = descargar_foto(username_cto, genero="hombre")  # Especificamos el género
         sede_cto = random.choice(sedes_objs)
+
+        # Crear el usuario y el empleado CTO
         cto_user = User.objects.create_user(username=username_cto, password='password123', email=email_cto)
         cto = Empleado.objects.create(
             user=cto_user,
@@ -155,15 +174,16 @@ class Command(BaseCommand):
             telefono=generar_telefono_espanol(),  # Teléfono español válido
             fecha_contratacion=date.today(),
             cumpleanos=date(1985, 8, 22),
-            foto=foto_cto,
+            foto=foto_cto,  # Foto acorde al género
             rol=rol_cto,
             sede=sede_cto,
             baja=False,
             excedencia=False,
             teletrabajo=False,
             vacaciones=False,
-            supervisor=ceo
+            supervisor=ceo  # El CEO supervisa al CTO
         )
+
         print(f"CTO creado con username: {username_cto} y foto: {foto_cto}")
 
         # Datos del CFO
@@ -172,7 +192,7 @@ class Command(BaseCommand):
         email_cfo = "cfo@company.com"
         rol_cfo = created_roles['CFO']
         username_cfo = f"{nombre_cfo.capitalize()}.{apellido_1_cfo.capitalize()}"
-        foto_cfo = descargar_foto(username_cfo)
+        foto_cfo = descargar_foto(username_cfo, genero = "mujer")
         sede_cfo = random.choice(sedes_objs)
         cfo_user = User.objects.create_user(username=username_cfo, password='password123', email=email_cfo)
         cfo = Empleado.objects.create(
@@ -215,35 +235,36 @@ class Command(BaseCommand):
             random_rol = created_roles[rol_nombre]
             for _ in range(cantidad):
                 sede = random.choice(sedes_objs)
-                # Generar un usuario aleatorio con randomuser.me
-                response = requests.get('https://randomuser.me/api/')
-                data = response.json()
-                user_info = data['results'][0]
-                nombre = user_info['name']['first']
-                apellido = user_info['name']['last']
-                email = user_info['email']
-                telefono = user_info['phone']
-                cumpleanos = user_info['dob']['date']
-                foto_url = user_info['picture']['large']
-                
-                # Descargar la foto
-                foto_response = requests.get(foto_url)
-                foto_nombre = f"{nombre.lower()}.{apellido.lower()}.jpg"
+
+                # Generar datos ficticios con Faker
+                nombre = fake.first_name()
+                apellido_1 = fake.last_name()
+                apellido_2 = fake.last_name()
+                email = fake.email()
+                telefono = generar_telefono_espanol()
+                cumpleanos = fake.date_of_birth(minimum_age=18, maximum_age=65)
+
+                # Obtener una foto de RandomUser.me
+                genero = "male" if fake.random_element(["hombre", "mujer"]) == "hombre" else "female"
+                foto_response = requests.get(f'https://randomuser.me/api/?gender={genero}')
+                foto_data = foto_response.json()
+                foto_url = foto_data['results'][0]['picture']['large']
+
+                # Descargar y guardar la foto
+                foto_nombre = f"{nombre.lower()}.{apellido_1.lower()}.jpg"
                 foto_path = os.path.join(settings.MEDIA_ROOT, 'empleados', foto_nombre)
-                print(foto_path)
-                
+                os.makedirs(os.path.dirname(foto_path), exist_ok=True)
+
                 with open(foto_path, 'wb') as f:
-                    f.write(foto_response.content)
+                    f.write(requests.get(foto_url).content)
 
                 # Asignar el supervisor de acuerdo a la jerarquía
                 supervisor_rol = jerarquia.get(random_rol.nombre)
                 if supervisor_rol:
-                    # Filtrar los empleados que ya tienen el rol de supervisor y que no están de baja ni tienen excedencia
                     posibles_supervisores = Empleado.objects.filter(rol=created_roles[supervisor_rol], baja=False, excedencia=False)
-                    # Elegir uno aleatoriamente
                     supervisor = posibles_supervisores.order_by('?').first() if posibles_supervisores.exists() else None
                 else:
-                    supervisor = None  # Si no tiene supervisor, asignamos None
+                    supervisor = None
 
                 # Para los Ingenieros de Backend y Frontend, asignar un Líder de Desarrollo aleatorio
                 if random_rol.nombre in ['INGENIERO_FRONTEND', 'INGENIERO_BACKEND']:
@@ -255,23 +276,25 @@ class Command(BaseCommand):
                 empleado = Empleado.objects.create(
                     user=user,
                     nombre=nombre,
-                    apellido_1=apellido,
-                    apellido_2=fake.last_name(),
+                    apellido_1=apellido_1,
+                    apellido_2=apellido_2,
                     email=email,
-                    telefono=generar_telefono_espanol(),  # Teléfono español válido
+                    telefono=telefono,
                     fecha_contratacion=date.today(),
-                    cumpleanos=cumpleanos[:10],  # Solo la fecha (yyyy-mm-dd)
-                    foto=f'empleados/{foto_nombre}',  # Nombre de la foto descargada
+                    cumpleanos=cumpleanos,
+                    foto=f'empleados/{foto_nombre}',  # Foto obtenida de RandomUser.me
                     rol=random_rol,
                     sede=sede,
                     baja=False,
                     excedencia=False,
                     teletrabajo=False,
                     vacaciones=False,
-                    supervisor=supervisor  # Asignamos el supervisor
+                    supervisor=supervisor  # Supervisor asignado
                 )
 
                 empleados_creados += 1
+
+                print(f"Se crearon {empleados_creados} empleados.")
 
         # Crear los empleados del escalón más bajo 
         empleados_por_crear_bajo = [
@@ -345,8 +368,7 @@ class Command(BaseCommand):
 
                 self.stdout.write(self.style.SUCCESS('Empleados y roles creados correctamente'))
         # Generar proyectos
-                # Generar proyectos
-        for i in range(1, 27):  # 26 proyectos
+        for i in range(1, 27):  
             proyecto = Proyecto.objects.create(
                 nombre=f'Proyecto {i}',
                 descripcion=f'Descripción del proyecto {i}',
