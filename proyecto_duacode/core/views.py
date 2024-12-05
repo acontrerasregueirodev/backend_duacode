@@ -1,15 +1,15 @@
+import json
 from rest_framework import viewsets, status
-from rest_framework.permissions import IsAuthenticated, AllowAny
-from sedes.models import Sede
-from .models import Empleado, RolModel
-from rest_framework.decorators import action
-from .serializers import EmpleadoSerializer, RolModelSerializer, OrganigramaSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.middleware.csrf import get_token
 from rest_framework.viewsets import ReadOnlyModelViewSet
-from rest_framework.decorators import api_view
-import json
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from django.middleware.csrf import get_token
+from sedes.models import Sede
+from .models import Empleado, RolModel
+from .serializers import EmpleadoSerializer, RolModelSerializer, OrganigramaSerializer, RolModelListSerializer
+# from rest_framework.decorators import api_view
 class WelcomeView(APIView):
     def get(self, request):
         csrf_token = get_token(request)  # Obtén el token CSRF

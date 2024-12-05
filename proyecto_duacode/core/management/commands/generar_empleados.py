@@ -28,12 +28,21 @@ class Command(BaseCommand):
 
 
     def handle(self, *args, **kwargs):
-        fake = Faker()
+        fake = Faker('es_ES')
         empleados = []
         proyectos = []
         sedes_objs = []
         salas_objs = []
 
+        
+        # Generar sedes
+        sedes = ['Sede Principal', 'Sede Secundaria', 'Sede Internacional']
+        for nombre_sede in sedes:
+            sede = Sede.objects.create(nombre=nombre_sede, direccion=f"Calle {fake.address()}")
+            sedes_objs.append(sede)
+            print(sede.direccion)
+
+        self.stdout.write(self.style.SUCCESS('Sedes generadas correctamente.'))
         # Path to the folder with room images
         imagenes_path = os.path.join(settings.MEDIA_ROOT, 'salas_reuniones')
         imagenes = [f for f in os.listdir(imagenes_path) if f.endswith('.jpg')]
@@ -106,7 +115,7 @@ class Command(BaseCommand):
         rol_ceo = created_roles['CEO']
         username_ceo = f"{nombre_ceo.capitalize()}.{apellido_1_ceo.capitalize()}"
         foto_ceo = descargar_foto(username_ceo)
-
+        sede_ceo = random.choice(sedes_objs)
         ceo_user = User.objects.create_user(username=username_ceo, password='password123', email=email_ceo)
         ceo = Empleado.objects.create(
             user=ceo_user,
@@ -119,7 +128,7 @@ class Command(BaseCommand):
             cumpleanos=date(1980, 5, 15),
             foto=foto_ceo,
             rol=rol_ceo,
-            sede=None,
+            sede=sede_ceo,
             baja=False,
             excedencia=False,
             teletrabajo=False,
@@ -135,7 +144,7 @@ class Command(BaseCommand):
         rol_cto = created_roles['CTO']
         username_cto = f"{nombre_cto.capitalize()}.{apellido_1_cto.capitalize()}"
         foto_cto = descargar_foto(username_cto)
-
+        sede_cto = random.choice(sedes_objs)
         cto_user = User.objects.create_user(username=username_cto, password='password123', email=email_cto)
         cto = Empleado.objects.create(
             user=cto_user,
@@ -148,7 +157,7 @@ class Command(BaseCommand):
             cumpleanos=date(1985, 8, 22),
             foto=foto_cto,
             rol=rol_cto,
-            sede=None,
+            sede=sede_cto,
             baja=False,
             excedencia=False,
             teletrabajo=False,
@@ -164,7 +173,7 @@ class Command(BaseCommand):
         rol_cfo = created_roles['CFO']
         username_cfo = f"{nombre_cfo.capitalize()}.{apellido_1_cfo.capitalize()}"
         foto_cfo = descargar_foto(username_cfo)
-
+        sede_cfo = random.choice(sedes_objs)
         cfo_user = User.objects.create_user(username=username_cfo, password='password123', email=email_cfo)
         cfo = Empleado.objects.create(
             user=cfo_user,
@@ -177,7 +186,7 @@ class Command(BaseCommand):
             cumpleanos=date(1987, 11, 30),
             foto=foto_cfo,
             rol=rol_cfo,
-            sede=None,
+            sede=sede_cfo,
             baja=False,
             excedencia=False,
             teletrabajo=False,
@@ -205,6 +214,7 @@ class Command(BaseCommand):
         for rol_nombre, cantidad in empleados_por_crear_jerarquia:
             random_rol = created_roles[rol_nombre]
             for _ in range(cantidad):
+                sede = random.choice(sedes_objs)
                 # Generar un usuario aleatorio con randomuser.me
                 response = requests.get('https://randomuser.me/api/')
                 data = response.json()
@@ -253,7 +263,7 @@ class Command(BaseCommand):
                     cumpleanos=cumpleanos[:10],  # Solo la fecha (yyyy-mm-dd)
                     foto=f'empleados/{foto_nombre}',  # Nombre de la foto descargada
                     rol=random_rol,
-                    sede=None,
+                    sede=sede,
                     baja=False,
                     excedencia=False,
                     teletrabajo=False,
@@ -263,20 +273,21 @@ class Command(BaseCommand):
 
                 empleados_creados += 1
 
-        # Crear los empleados del escalón más bajo (ya añadido)
+        # Crear los empleados del escalón más bajo 
         empleados_por_crear_bajo = [
-            ('INGENIERO_FRONTEND', 30),
-            ('INGENIERO_BACKEND', 25),
-            ('INGENIERO_QA', 20),
-            ('ESPECIALISTA_MARKETING', 10),
+            ('INGENIERO_FRONTEND', 25),
+            ('INGENIERO_BACKEND', 20),
+            ('INGENIERO_QA', 10),
+            ('ESPECIALISTA_MARKETING', 5),
             ('ESPECIALISTA_SOPORTE', 8),
-            ('COORDINADOR_PROYECTO', 10),
+            ('COORDINADOR_PROYECTO', 5),
             ('PROPIETARIO_PRODUCTO', 8),
         ]
 
         for rol_nombre, cantidad in empleados_por_crear_bajo:
             random_rol = created_roles[rol_nombre]
             for _ in range(cantidad):
+                sede = random.choice(sedes_objs)
                 # Generar un usuario aleatorio con randomuser.me
                 response = requests.get('https://randomuser.me/api/')
                 data = response.json()
@@ -322,7 +333,7 @@ class Command(BaseCommand):
                     cumpleanos=cumpleanos[:10],  # Solo la fecha (yyyy-mm-dd)
                     foto=f'empleados/{foto_nombre}',  # Ruta relativa a la foto
                     rol=random_rol,
-                    sede=None,  # Aquí podrías asignar una sede si es necesario
+                    sede=sede,  # Aquí podrías asignar una sede si es necesario
                     baja=random.choice([True, False]),  # Valor aleatorio para baja
                     excedencia=random.choice([True, False]),  # Valor aleatorio para excedencia
                     teletrabajo=random.choice([True, False]),  # Valor aleatorio para teletrabajo
@@ -333,19 +344,9 @@ class Command(BaseCommand):
                 empleados_creados += 1
 
                 self.stdout.write(self.style.SUCCESS('Empleados y roles creados correctamente'))
-
-        # Generar sedes
-        sedes = ['Sede Principal', 'Sede Secundaria', 'Sede Internacional']
-        for nombre_sede in sedes:
-            sede = Sede.objects.create(nombre=nombre_sede, direccion=f"Calle {nombre_sede}")
-            sedes_objs.append(sede)
-
-        self.stdout.write(self.style.SUCCESS('Sedes generadas correctamente.'))
-
-
-
         # Generar proyectos
-        for i in range(1, 6):
+                # Generar proyectos
+        for i in range(1, 27):  # 26 proyectos
             proyecto = Proyecto.objects.create(
                 nombre=f'Proyecto {i}',
                 descripcion=f'Descripción del proyecto {i}',
@@ -354,7 +355,17 @@ class Command(BaseCommand):
             )
             proyectos.append(proyecto)
 
-        self.stdout.write(self.style.SUCCESS('Proyectos generados correctamente.'))
+            empleados = Empleado.objects.all()
+
+            # Asignar entre 5 y 12 empleados aleatorios al proyecto
+            num_empleados = random.randint(5, 12)
+            if num_empleados <= len(empleados):
+                empleados_asignados = random.sample(list(empleados), num_empleados)
+                proyecto.empleados.add(*empleados_asignados)
+            else:
+                self.stdout.write(self.style.WARNING(f"No hay suficientes empleados. Hay {len(empleados)} empleados disponibles. Proyecto {proyecto.nombre} no tiene suficientes empleados asignados."))
+
+        self.stdout.write(self.style.SUCCESS('Proyectos generados y empleados asignados correctamente.'))
 
 
         # Generar salas de reuniones y asignarles imágenes

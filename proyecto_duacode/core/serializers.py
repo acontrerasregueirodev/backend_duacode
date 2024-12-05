@@ -1,7 +1,12 @@
 from rest_framework import serializers
 from .models import Empleado, RolModel
 import json
-
+from sedes.serializers import SedeSerializer
+# from proyectos.serializers import ProyectoSerializer
+class RolModelListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RolModel
+        fields = ['id', 'nombre']  # Asegúrate de incluir los campos que quieres mostrar
 class RolModelSerializer(serializers.ModelSerializer):
     rol_display = serializers.SerializerMethodField()
     class Meta:
@@ -19,7 +24,8 @@ class EmpleadoSerializer(serializers.ModelSerializer):
     # Incluir el serializer del rol
     rol = RolModelSerializer()    
     rol_display = serializers.CharField(source='rol.rol_display', read_only=True)  # Añadir el nombre legible del rol
-
+    sede = SedeSerializer()
+    # proyecto = ProyectoSerializer()
     # Para incluir el supervisor, que se obtiene a través del modelo Empleado
     supervisor = serializers.SerializerMethodField()
     # Personalizar los campos de fechas
