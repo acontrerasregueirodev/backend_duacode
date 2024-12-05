@@ -38,7 +38,8 @@ class Command(BaseCommand):
         # Generar sedes
         sedes = ['Sede Principal', 'Sede Secundaria', 'Sede Internacional']
         for nombre_sede in sedes:
-            sede = Sede.objects.create(nombre=nombre_sede, direccion=f"Calle {fake.address()}")
+            fake = Faker('es_ES')
+            sede = Sede.objects.create(nombre=nombre_sede, direccion=f"{fake.address()}",ciudad =  f"{fake.city()}", pais = f"{fake.country()}")
             sedes_objs.append(sede)
             print(sede.direccion)
 
