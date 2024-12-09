@@ -12,10 +12,10 @@ from .serializers import EmpleadoSerializer, RolModelSerializer, OrganigramaSeri
 # from rest_framework.decorators import api_view
 class WelcomeView(APIView):
     def get(self, request):
-        csrf_token = get_token(request)  # Obtén el token CSRF
+        # csrf_token = get_token(request)  # Obtén el token CSRF
         return Response({
             "message": "Bienvenido a Duacode TouchScreen!",
-            "csrfToken": csrf_token  # Incluye el token CSRF en la respuesta
+            # "csrfToken": csrf_token  # Incluye el token CSRF en la respuesta
         })
 
 class RolViewSet(ReadOnlyModelViewSet):

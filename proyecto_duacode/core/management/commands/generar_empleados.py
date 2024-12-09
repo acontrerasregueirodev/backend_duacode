@@ -26,7 +26,6 @@ def generar_telefono_espanol():
 class Command(BaseCommand):
     help = 'Genera datos ficticios para empleados, proyectos, sedes, salas y reuniones'
 
-
     def handle(self, *args, **kwargs):
         fake = Faker('es_ES')
         empleados = []
