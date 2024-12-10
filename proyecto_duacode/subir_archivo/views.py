@@ -1,5 +1,5 @@
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated  # Permiso de autenticación
+from rest_framework.permissions import IsAuthenticated, AllowAny  # Permiso de autenticación
 from rest_framework.response import Response
 from rest_framework import status
 from .forms import FileUploadForm
@@ -9,6 +9,9 @@ class UploadFile(APIView):
     permission_classes = [IsAuthenticated]  # Garantiza que el usuario esté autenticado
 
     def get(self, request):
+        # Permitir acceso a cualquier usuario, autenticado o no
+        self.permission_classes = [AllowAny]
+        self.check_permissions(request)  # Re-evalúa los permisos con la nueva configuración
         files = SubirArchivo.objects.all()  # Obtener todos los archivos subidos
         file_list = [{"file_name": file.archivo.name, "uploaded_at": file.fecha_subida} for file in files]
         return Response(file_list)
