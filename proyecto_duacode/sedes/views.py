@@ -7,7 +7,20 @@ from core.models import Empleado
 from .serializers import ReservaSalaSerializer, SedeSerializer, SalaReunionesSerializer
 from rest_framework.exceptions import NotFound
 from rest_framework.generics import ListAPIView
+from django.db.models import Count
+from rest_framework.views import APIView
 
+class ReunionesPorSedeView(APIView):
+    """
+    Devuelve el número de reuniones por cada sede.
+    """
+    def get(self, request, *args, **kwargs):
+        datos = (
+            Sede.objects.annotate(
+                num_reuniones=Count('salas__reservas')
+            ).values('nombre', 'num_reuniones')
+        )
+        return Response(datos)
 class SedeViewSet(viewsets.ModelViewSet):
     queryset = Sede.objects.all()  # Recuperar todas las sedes
     serializer_class = SedeSerializer  # Usar el serializer definido antes

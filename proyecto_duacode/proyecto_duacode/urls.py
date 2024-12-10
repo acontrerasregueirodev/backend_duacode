@@ -34,8 +34,7 @@ urlpatterns = [
     path('codigo_qr/', include('codigo_qr.urls')),
     path('auth/', include('login.urls')),  # Include login app URLs
     path('', WelcomeView.as_view(), name='welcome'),  # Ruta raíz del proyecto
-    
-
+    path('dashboard/', include('dashboard.urls')),
 ]
 
 # Solo en desarrollo, para servir archivos estáticos y multimedia

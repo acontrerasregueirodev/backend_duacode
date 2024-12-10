@@ -56,7 +56,7 @@ INSTALLED_APPS = [
     'contacto',
     'codigo_qr',
     'login',
-    
+    'dashboard',   
 ]
 
 LOGOUT_REDIRECT_URL = '/'
@@ -93,7 +93,7 @@ ROOT_URLCONF = 'proyecto_duacode.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['dashboard/templates',],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

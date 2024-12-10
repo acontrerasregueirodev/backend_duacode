@@ -7,6 +7,7 @@ from .models import Proyecto
 from core.models import Empleado
 from .serializers import ProyectoSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.views import APIView
 
 class ProyectoViewSet(viewsets.ModelViewSet):
     queryset = Proyecto.objects.all()
@@ -56,3 +57,20 @@ class ProyectoViewSet(viewsets.ModelViewSet):
             return Response(ProyectoSerializer(proyecto).data, status=status.HTTP_200_OK)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ProyectosPorEmpleadoView(APIView):
+    def get(self, request, empleado_id):
+        try:
+            # Buscar el empleado por su ID
+            empleado = Empleado.objects.get(id=empleado_id)
+            # Obtener los proyectos asociados al empleado
+            proyectos = empleado.proyectos.all()  # Utilizamos related_name
+            # Serializar los datos
+            serializer = ProyectoSerializer(proyectos, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Empleado.DoesNotExist:
+            return Response(
+                {"error": "Empleado no encontrado."},
+                status=status.HTTP_404_NOT_FOUND
+            )
