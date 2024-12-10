@@ -19,6 +19,7 @@
   </head>
   <body class="hold-transition sidebar-mini layout-fixed">
     {% include './modal_eliminar_empleado.html' %}
+    {% include './modal_editar_empleado.html' %}
     <div class="wrapper">
       <!-- Barra de navegación -->
       <nav class="main-header navbar navbar-expand navbar-white navbar-light">
@@ -153,12 +154,13 @@
                       {% endif %}
                     </td>
                     <td>
-                      <a href="#" class="btn btn-info btn-sm">
-                        <i class="fa fa-pencil-alt"></i> Editar
-                      </a>
-                      <a href="#" class="btn btn-danger btn-sm" onclick="$('#modaleliminarempleado').modal('show');">
-  <i class="fas fa-trash-alt"></i> Borrar
+                      <a href="#" class="btn btn-info btn-sm" onclick="abrirModalEditar({{ empleado.id }}, '{{ empleado.nombre }}', '{{ empleado.apellido_1 }}', '{{ empleado.rol }}', '{{ empleado.supervisor.nombre }}')">
+  <i class="fa fa-pencil-alt"></i> Editar
 </a>
+                                  <!-- Pasamos el ID del empleado a través del atributo data-id -->
+                    <a href="#" class="btn btn-danger btn-sm" onclick="$('#modaleliminarempleado').modal('show'); showDeleteModal({{ empleado.id }});">
+                        <i class="fas fa-trash-alt"></i> Borrar
+                    </a>
                     </td>
                   </tr>
                   {% empty %}
@@ -241,26 +243,77 @@
         }
       });
     </script>
+    
     <script>
-      function getCookie(name) {
-    const cookieValue = document.cookie
-        .split('; ')
-        .find(row => row.startsWith(name + '='))
-        ?.split('=')[1];
-        console.log(cookieValue)
-    return cookieValue || '';
+      function abrirModalEditar(id, nombre, apellido, rol, supervisor) {
+  // Asignar los valores a los campos del formulario
+  document.getElementById('nombreEmpleado').value = nombre;
+  document.getElementById('apellidoEmpleado').value = apellido;
+  document.getElementById('rolEmpleado').value = rol;
+  document.getElementById('supervisorEmpleado').value = supervisor;
+
+  // Abrir la modal
+  $('#modalEditarEmpleado').modal('show');
+
+  // Asignar un identificador al botón de guardar para que se pueda realizar la edición en el backend
+  document.getElementById('guardarCambios').setAttribute('data-id', id);
+}
+
+document.getElementById('guardarCambios').addEventListener('click', function() {
+  const empleadoId = this.getAttribute('data-id');
+  const nombre = document.getElementById('nombreEmpleado').value;
+  const apellido = document.getElementById('apellidoEmpleado').value;
+  const rol = document.getElementById('rolEmpleado').value;
+  const supervisor = document.getElementById('supervisorEmpleado').value;
+
+  // Enviar los datos al servidor para actualizar la información del empleado
+  fetch(`/api/empleados/${empleadoId}/`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': getCookie('csrftoken')  // Asegúrate de pasar el token CSRF
+    },
+    body: JSON.stringify({
+      nombre: nombre,
+      apellido: apellido,
+      rol: rol,
+      supervisor: supervisor
+    })
+  })
+  .then(response => {
+    if (response.ok) {
+      // Cerrar la modal y recargar la página para ver los cambios
+      $('#modalEditarEmpleado').modal('hide');
+      location.reload();
+    } else {
+      alert('Error al guardar los cambios.');
+    }
+  })
+  .catch(error => console.error('Error:', error));
+});
+      function showDeleteModal(empleadoId) {
+    // Asignar el ID del empleado al botón de confirmación de eliminación
+    document.getElementById('confirmDelete').setAttribute('data-id', empleadoId);
+}
+function getCookie(name) {
+    let match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+    if (match) return match[2];
+    return null;
 }
   document.getElementById('confirmDelete').addEventListener('click', function() {
     // Lógica para eliminar al empleado
-    const empleadoId = 123; // Cambia esto por el ID dinámico del empleado
-    fetch(`/api/empleados/${empleadoId}/`, {
-        method: 'DELETE',
-        headers: {
-            'X-CSRFToken': getCookie('csrftoken'), // Obtén el token CSRF de las cookies
-            'Content-Type': 'application/json'
-        },
-        credentials: 'include' // Asegura que las cookies de sesión se envíen con la solicitud
-    })
+    const empleadoId = this.getAttribute('data-id');
+    const accessToken = getCookie('access_token');
+const refreshToken = getCookie('refresh_token');
+fetch(`/api/empleados/${empleadoId}/`, {
+    method: 'DELETE',
+    headers: {
+        'X-CSRFToken': getCookie('csrftoken'),  // Token CSRF
+        'Authorization': `Bearer ${accessToken}`,  // Enviar el access_token en el encabezado Authorization
+        'Content-Type': 'application/json'
+    },
+    credentials: 'include'  // Asegura que las cookies de sesión se envíen con la solicitud
+})
     .then(response => {
       if (response.ok) {
         // Cierra la modal y actualiza la página

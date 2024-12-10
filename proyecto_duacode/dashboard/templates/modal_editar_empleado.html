@@ -1,0 +1,44 @@
+<!-- Modal Editar Empleado -->
+<div class="modal fade" id="modalEditarEmpleado" tabindex="-1" role="dialog" aria-labelledby="modalEditarEmpleadoLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalEditarEmpleadoLabel">Editar Empleado</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="form-editar-empleado">
+          <!-- Aquí puedes colocar los campos para editar los datos del empleado -->
+          <div class="form-group">
+            <label for="nombreEmpleado">Nombre</label>
+            <input type="text" class="form-control" id="nombreEmpleado" required>
+          </div>
+          <div class="form-group">
+            <label for="apellidoEmpleado">Apellido</label>
+            <input type="text" class="form-control" id="apellidoEmpleado" required>
+          </div>
+          <div class="form-group">
+            <label for="rolEmpleado">Rol</label>
+            <select class="form-control" id="rolEmpleado">
+              <!-- Aquí puedes añadir los roles disponibles -->
+              <option value="1">Administrador</option>
+              <option value="2">Empleado</option>
+              <option value="3">Supervisor</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="supervisorEmpleado">Supervisor</label>
+            <input type="text" class="form-control" id="supervisorEmpleado">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        <button type="button" class="btn btn-primary" id="guardarCambios">Guardar cambios</button>
+      </div>
+    </div>
+  </div>
+</div>
+
