@@ -8,10 +8,13 @@ from .models import SubirArchivo
 class UploadFile(APIView):
     permission_classes = [IsAuthenticated]  # Garantiza que el usuario esté autenticado
 
+    def get_permissions(self):
+        # Permite acceso sin autenticación solo para GET
+        if self.request.method == 'GET':
+            return [AllowAny()]
+        return [IsAuthenticated()]
+
     def get(self, request):
-        # Permitir acceso a cualquier usuario, autenticado o no
-        self.permission_classes = [AllowAny]
-        self.check_permissions(request)  # Re-evalúa los permisos con la nueva configuración
         files = SubirArchivo.objects.all()  # Obtener todos los archivos subidos
         file_list = [{"file_name": file.archivo.name, "uploaded_at": file.fecha_subida} for file in files]
         return Response(file_list)
