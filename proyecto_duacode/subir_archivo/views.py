@@ -16,7 +16,7 @@ class UploadFile(APIView):
 
     def get(self, request):
         files = SubirArchivo.objects.all()  # Obtener todos los archivos subidos
-        file_list = [{"file_name": file.archivo.name, "uploaded_at": file.fecha_subida} for file in files]
+        file_list = [{"file_name": file.file.name, "uploaded_at": file.uploaded_at} for file in files]
         return Response(file_list)
 
     def post(self, request):
@@ -25,6 +25,7 @@ class UploadFile(APIView):
             form.save()  # Guarda el archivo y la descripción
             return Response({'message': 'Archivo subido con éxito'}, status=status.HTTP_201_CREATED)
         return Response({'error': form.errors}, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 

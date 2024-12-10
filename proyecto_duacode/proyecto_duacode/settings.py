@@ -105,7 +105,13 @@ TEMPLATES = [
         },
     },
 ]
-
+# Asegúrate de que el token se lea desde las cookies
+SIMPLE_JWT = {
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_COOKIE': 'access_token',  # Cookie con el token de acceso
+    'USER_ID_FIELD': 'username',
+    'USER_ID_CLAIM': 'username',
+}
 WSGI_APPLICATION = 'proyecto_duacode.wsgi.application'
 
 # Database configuration
