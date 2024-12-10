@@ -108,6 +108,9 @@ class Empleado(models.Model):
         years = delta.days // 365
         months = (delta.days % 365) // 30
         return f'{years} años y {months} meses'
+    
+    def total_proyectos(self):
+        return self.proyectos.count()  # Usa el related_name 'proyectos' para contar los proyectos relacionados
 
     def obtener_informacion_completa(self):
         """
@@ -128,5 +131,3 @@ class Empleado(models.Model):
             'excedencia': 'Sí' if self.excedencia else 'No',
             'teletrabajo': 'Sí' if self.teletrabajo else 'No',
         }
-        
-        

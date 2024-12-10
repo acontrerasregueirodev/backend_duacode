@@ -96,16 +96,16 @@ class EmpleadoViewset(viewsets.ModelViewSet):
         except Empleado.DoesNotExist:
             return Response({'error': 'Empleado no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
 
-    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated], url_path='perfil')
-    def perfil(self, request):
-        """
-        Esta acción personalizada permite que un empleado vea su perfil.
-        """
-        empleado = self.queryset.filter(user=request.user).first()  # Cambiado 'usuario' a 'user'
-        if empleado:
-            serializer = self.get_serializer(empleado)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response({'error': 'Empleado no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
+    # @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated], url_path='perfil')
+    # def perfil(self, request):
+    #     """
+    #     Esta acción personalizada permite que un empleado vea su perfil.
+    #     """
+    #     empleado = self.queryset.filter(user=request.user).first()  # Cambiado 'usuario' a 'user'
+    #     if empleado:
+    #         serializer = self.get_serializer(empleado)
+    #         return Response(serializer.data, status=status.HTTP_200_OK)
+    #     return Response({'error': 'Empleado no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
 
 
 class OrganigramaView(APIView):
