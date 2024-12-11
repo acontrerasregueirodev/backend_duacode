@@ -162,12 +162,23 @@
           {{ empleado.sede.nombre }}  
           </td>
           <td>
-            <a href="#" class="btn btn-info btn-sm" onclick="abrirModalEditar(
-              {{ empleado.id }},'{{ empleado.nombre }}', '{{ empleado.apellido_1 }}', 
-               '{{ empleado.apellido_2 }}','{{ empleado.email }}', '{{ empleado.telefono }}','{{ empleado.fecha_contratacion|date:"Y-m-d"|escapejs }}',
-               '{{ empleado.cumpleanos|date:"Y-m-d"|escapejs }}')">
-              <i class="fa fa-pencil-alt"></i> Editar
-            </a>
+  <a href="#" class="btn btn-info btn-sm" onclick="abrirModalEditar(
+    {{ empleado.id }},
+    '{{ empleado.nombre }}',
+    '{{ empleado.apellido_1 }}',
+    '{{ empleado.apellido_2 }}',
+    '{{ empleado.email }}',
+    '{{ empleado.telefono }}',
+    '{{ empleado.fecha_contratacion|date:"Y-m-d"|escapejs }}',
+    '{{ empleado.cumpleanos|date:"Y-m-d"|escapejs }}',
+    '{{ empleado.rol.id }}',
+    '{{ empleado.sede.id }}',
+    '{{ empleado.baja }}',
+    '{{ empleado.excedencia }}',
+    '{{ empleado.teletrabajo }}',
+    '{{ empleado.vacaciones }}'
+)">   <i class="fa fa-pencil-alt"></i> Editar              
+</a>
             <a href="#" class="btn btn-danger btn-sm" onclick="$('#modaleliminarempleado').modal('show'); showDeleteModal({{ empleado.id }});">
               <i class="fas fa-trash-alt"></i> Borrar
             </a>
@@ -256,53 +267,214 @@
     </script>
     
     <script>
-function abrirModalEditar(id, nombre, apellido1, apellido2, email, telefono, fechaContratacion, cumpleanos, fotoUrl, rol, sede, baja, excedencia, teletrabajo, vacaciones, supervisor, qrCode) {
-  // Asignar los valores a los campos del formulario
-  //document.getElementById('fotoEmpleado').value = foto;
+function abrirModalEditar(id, nombre, apellido1, apellido2, email, telefono, fechaContratacion, cumpleanos, rol, sede, baja, excedencia, teletrabajo, vacaciones, supervisor, qrCode) {
   document.getElementById('nombreEmpleado').value = nombre;
-  document.getElementById('apellidoEmpleado1').value = apellido1;
-  document.getElementById('apellidoEmpleado2').value = apellido2;
-  document.getElementById('emailEmpleado').value = email;
-  document.getElementById('telefonoEmpleado').value = telefono;
-  document.getElementById('fechaContratacionEmpleado').value = fechaContratacion;
-  document.getElementById('cumpleanosEmpleado').value = cumpleanos;
-//document.getElementById('fotoEmpleado').src = fotoUrl ? fotoUrl : '/static/default-qr.png';
-  document.getElementById('rolEmpleado').value = rol;
-  document.getElementById('sedeEmpleado').value = sede ;
-  document.getElementById('bajaEmpleado').checked = baja;
-  document.getElementById('excedenciaEmpleado').checked = excedencia;
-  document.getElementById('teletrabajoEmpleado').checked = teletrabajo;
-  document.getElementById('vacacionesEmpleado').checked = vacaciones;
-  //document.getElementById('supervisorEmpleado').value = supervisor;
-  //document.getElementById('qrEmpleado').src = qrCode ? qrCode : '/static/default-qr.png';  // Ruta por defecto si no tiene QR
+    document.getElementById('apellidoEmpleado1').value = apellido1;
+    document.getElementById('apellidoEmpleado2').value = apellido2;
+    document.getElementById('emailEmpleado').value = email;
+    document.getElementById('telefonoEmpleado').value = telefono;
+    document.getElementById('fechaContratacionEmpleado').value = fechaContratacion;
+    document.getElementById('cumpleanosEmpleado').value = cumpleanos;
+    // Establecer el valor seleccionado para rol y sede
+    document.getElementById('rolEmpleado').value = rol;
+    document.getElementById('sedeEmpleado').value = sede;
+    const convertirBooleano = (valor) => valor === "True";
+    document.getElementById('bajaEmpleado').checked = convertirBooleano(baja);
+    document.getElementById('excedenciaEmpleado').checked = convertirBooleano(excedencia);
+    document.getElementById('teletrabajoEmpleado').checked = convertirBooleano(teletrabajo);
+    document.getElementById('vacacionesEmpleado').checked = convertirBooleano(vacaciones);
 
+cargarSelects();
   // Abrir la modal
   $('#modalEditarEmpleado').modal('show');
+function cargarSelects() {
+    // Aquí deberías tener los valores de roles y sedes (puedes cargarlos desde un archivo JS, hacer una petición AJAX al backend, etc.)
+    const roles = [
+    {
+        "id": 1,
+        "nombre": "CEO",
+        "rol_display": "CEO"
+    },
+    {
+        "id": 2,
+        "nombre": "CTO",
+        "rol_display": "CTO"
+    },
+    {
+        "id": 3,
+        "nombre": "LÍDER_DESARROLLO",
+        "rol_display": "Líder de Equipo de Desarrollo"
+    },
+    {
+        "id": 4,
+        "nombre": "INGENIERO_FRONTEND",
+        "rol_display": "Ingeniero de Frontend"
+    },
+    {
+        "id": 5,
+        "nombre": "INGENIERO_BACKEND",
+        "rol_display": "Ingeniero de Backend"
+    },
+    {
+        "id": 6,
+        "nombre": "LÍDER_QA",
+        "rol_display": "Líder de QA"
+    },
+    {
+        "id": 7,
+        "nombre": "INGENIERO_QA",
+        "rol_display": "Ingeniero de QA"
+    },
+    {
+        "id": 8,
+        "nombre": "GERENTE_PROYECTO",
+        "rol_display": "Gerente de Proyecto"
+    },
+    {
+        "id": 9,
+        "nombre": "COORDINADOR_PROYECTO",
+        "rol_display": "Coordinador de Proyecto"
+    },
+    {
+        "id": 10,
+        "nombre": "CFO",
+        "rol_display": "CFO"
+    },
+    {
+        "id": 11,
+        "nombre": "GERENTE_PRODUCTO",
+        "rol_display": "Gerente de Producto"
+    },
+    {
+        "id": 12,
+        "nombre": "PROPIETARIO_PRODUCTO",
+        "rol_display": "Propietario de Producto"
+    },
+    {
+        "id": 13,
+        "nombre": "GERENTE_MARKETING",
+        "rol_display": "Gerente de Marketing"
+    },
+    {
+        "id": 14,
+        "nombre": "ESPECIALISTA_MARKETING",
+        "rol_display": "Especialista en Marketing Digital"
+    },
+    {
+        "id": 15,
+        "nombre": "GERENTE_VENTAS",
+        "rol_display": "Gerente de Ventas"
+    },
+    {
+        "id": 16,
+        "nombre": "REPRESENTANTE_VENTAS",
+        "rol_display": "Representante de Ventas"
+    },
+    {
+        "id": 17,
+        "nombre": "GERENTE_SOPORTE",
+        "rol_display": "Gerente de Soporte"
+    },
+    {
+        "id": 18,
+        "nombre": "ESPECIALISTA_SOPORTE",
+        "rol_display": "Especialista en Soporte al Cliente"
+    }
+        // Añadir más roles según lo necesario
+    ];
 
+    const sedes = [
+    {
+        "id": 1,
+        "nombre": "Sede Principal",
+        "direccion": "Camino de Eugenio Casanova 78\nGirona, 31485",
+        "ciudad": "Asturias",
+        "pais": "Côte d'Ivoire"
+    },
+    {
+        "id": 2,
+        "nombre": "Sede Secundaria",
+        "direccion": "Callejón Florina Fortuny 6\nNavarra, 45066",
+        "ciudad": "Pontevedra",
+        "pais": "Suecia"
+    },
+    {
+        "id": 3,
+        "nombre": "Sede Internacional",
+        "direccion": "Alameda Eva Ramos 10\nAlicante, 26205",
+        "ciudad": "Burgos",
+        "pais": "República Democrática del Congo"
+    }
+        // Añadir más sedes según lo necesario
+    ];
+
+    // Llenar el select de roles
+    const selectRol = document.getElementById('rolEmpleado');
+    selectRol.innerHTML = ''; // Limpiar el select antes de añadir opciones
+    roles.forEach(rol => {
+        const option = document.createElement('option');
+        option.value = rol.id;
+        option.textContent = rol.nombre;
+        selectRol.appendChild(option);
+    });
+
+    // Llenar el select de sedes
+    const selectSede = document.getElementById('sedeEmpleado');
+    selectSede.innerHTML = ''; // Limpiar el select antes de añadir opciones
+    sedes.forEach(sede => {
+        const option = document.createElement('option');
+        option.value = sede.id;
+        option.textContent = sede.nombre;
+        selectSede.appendChild(option);
+    });
+}
   // Asignar un identificador al botón de guardar para que se pueda realizar la edición en el backend
   document.getElementById('guardarCambios').setAttribute('data-id', id);
 }
 
 
 document.getElementById('guardarCambios').addEventListener('click', function() {
-  const empleadoId = this.getAttribute('data-id');
+  const empleadoId = this.getAttribute('data-id'); // Asumo que el data-id contiene el ID del empleado
   const nombre = document.getElementById('nombreEmpleado').value;
-  const apellido = document.getElementById('apellidoEmpleado').value;
-  const rol = document.getElementById('rolEmpleado').value;
-  const supervisor = document.getElementById('supervisorEmpleado').value;
+  const apellido1 = document.getElementById('apellidoEmpleado1').value;
+  const apellido2 = document.getElementById('apellidoEmpleado2').value;
+  const email = document.getElementById('emailEmpleado').value;
+  const fechaContratacion = document.getElementById('fechaContratacionEmpleado').value;
+  const cumpleanos = document.getElementById('cumpleanosEmpleado').value;
+  const telefono = document.getElementById('telefonoEmpleado').value;
+  const rol =  document.getElementById('rolEmpleado').value ;
+  const sede = document.getElementById('sedeEmpleado').value;
 
+  // Obtener el estado de los checkboxes
+  const baja = document.getElementById('bajaEmpleado').checked;
+  const excedencia = document.getElementById('excedenciaEmpleado').checked;
+  const teletrabajo = document.getElementById('teletrabajoEmpleado').checked;
+  const vacaciones = document.getElementById('vacacionesEmpleado').checked;
+    const accessToken = getCookie('access_token');
+const refreshToken = getCookie('refresh_token');
   // Enviar los datos al servidor para actualizar la información del empleado
   fetch(`/api/empleados/${empleadoId}/`, {
+    
     method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-CSRFToken': getCookie('csrftoken')  // Asegúrate de pasar el token CSRF
+        headers: {
+        'X-CSRFToken': getCookie('csrftoken'),  // Token CSRF
+        'Authorization': `Bearer ${accessToken}`,  // Enviar el access_token en el encabezado Authorization
+        'Content-Type': 'application/json'
     },
     body: JSON.stringify({
       nombre: nombre,
-      apellido: apellido,
+      apellido_1: apellido1,
+      apellido_2: apellido2,
+      email: email,
+      fecha_contratacion: fechaContratacion,
+      cumpleanos: cumpleanos,
+      telefono: telefono,
       rol: rol,
-      supervisor: supervisor
+      sede: sede,
+      baja: baja,
+      excedencia: excedencia,
+      teletrabajo: teletrabajo,
+      vacaciones: vacaciones
     })
   })
   .then(response => {

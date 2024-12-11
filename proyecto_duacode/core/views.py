@@ -48,17 +48,23 @@ class EmpleadoViewset(viewsets.ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         # Recuperar el objeto empleado desde la base de datos
+        print(request.data)
         empleado = self.get_object()
 
         # Obtener los datos del request
         data = request.data
 
         # Asegurarse de deserializar el campo 'rol'
+        # Verificar si el 'rol' es válido
+        rol_id = data.get('rol')
+        if not rol_id:
+            return Response({"detail": "El campo 'rol' es obligatorio."}, status=400)
+
         try:
-            rol_data = json.loads(data.get('rol', '{}'))  # Deserializar el JSON
-            rol_id = rol_data.get('id')  # Acceder al campo 'id'
-        except json.JSONDecodeError:
-            return Response({"detail": "El campo 'rol' no es válido."}, status=400)
+            # Obtener el rol si es necesario (opcional dependiendo de tu lógica)
+            rol = RolModel.objects.get(id=rol_id)
+        except RolModel.DoesNotExist:
+            return Response({"detail": "El rol especificado no existe."}, status=400)
 
         # Asignar el valor de 'sede' como una instancia de Sede
         sede_id = data.get('sede')
@@ -77,10 +83,10 @@ class EmpleadoViewset(viewsets.ModelViewSet):
         empleado.telefono = data.get('telefono')
         empleado.rol_id = rol_id  # Actualizar el rol con el id deserializado
         empleado.sede = sede
-        empleado.baja = data.get('baja') == 'true'
-        empleado.excedencia = data.get('excedencia') == 'true'
-        empleado.teletrabajo = data.get('teletrabajo') == 'true'
-        empleado.vacaciones = data.get('vacaciones') == 'false'
+        empleado.baja = data.get('baja') 
+        empleado.excedencia = data.get('excedencia') 
+        empleado.teletrabajo = data.get('teletrabajo') 
+        empleado.vacaciones = data.get('vacaciones') 
 
         # Guardar el empleado actualizado
         empleado.save()

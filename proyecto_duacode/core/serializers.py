@@ -4,9 +4,15 @@ import json
 from sedes.serializers import SedeSerializer
 # from proyectos.serializers import ProyectoSerializer
 class RolModelListSerializer(serializers.ModelSerializer):
+    rol_display = serializers.SerializerMethodField()
     class Meta:
         model = RolModel
-        fields = ['id', 'nombre']  # Asegúrate de incluir los campos que quieres mostrar
+        fields = ['id', 'nombre','rol_display']  
+        # Asegúrate de incluir los campos que quieres mostrar
+    def get_rol_display(self,obj):
+        # Mapea los códigos a sus nombres legibles
+        rol_map = dict(RolModel.ROL_CHOICES)
+        return rol_map.get(obj.nombre, obj.nombre)  # Devuelve el nombre legible o el valor en caso de no encontrarlo
 class RolModelSerializer(serializers.ModelSerializer):
     rol_display = serializers.SerializerMethodField()
     class Meta:
