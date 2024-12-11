@@ -40,10 +40,16 @@ class EmpleadoViewset(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         data = request.data
-        serializer = self.get_serializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        print(data)
+        serializer = EmpleadoSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer = self.get_serializer(data=data)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            print(f"Errores de validación: {serializer.errors}")
+            return Response(serializer.errors, status=400)           
 
 
     def update(self, request, *args, **kwargs):

@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import Empleado, RolModel
 import json
 from sedes.serializers import SedeSerializer
+from sedes.models import Sede
 # from proyectos.serializers import ProyectoSerializer
 class RolModelListSerializer(serializers.ModelSerializer):
     rol_display = serializers.SerializerMethodField()
@@ -28,9 +29,11 @@ class EmpleadoSerializer(serializers.ModelSerializer):
     foto = serializers.CharField(required=False)  # Aceptar una URL en lugar de un archivo
     qr_code = serializers.CharField(required=False)  # Aceptar una URL en lugar de un archivo
     # Incluir el serializer del rol
-    rol = RolModelSerializer()    
+    rol = serializers.PrimaryKeyRelatedField(queryset=RolModel.objects.all())
+    sede = serializers.PrimaryKeyRelatedField(queryset=Sede.objects.all())
+    # rol = RolModelSerializer()    
     rol_display = serializers.CharField(source='rol.rol_display', read_only=True)  # Añadir el nombre legible del rol
-    sede = SedeSerializer()
+    # sede = SedeSerializer()
     # proyecto = ProyectoSerializer()
     # Para incluir el supervisor, que se obtiene a través del modelo Empleado
     supervisor = serializers.SerializerMethodField()
