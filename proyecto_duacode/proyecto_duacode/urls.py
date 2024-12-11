@@ -35,11 +35,11 @@ urlpatterns = [
     path('auth/', include('login.urls')),  # Include login app URLs
     path('', WelcomeView.as_view(), name='welcome'),  # Ruta raíz del proyecto
     path('dashboard/', include('dashboard.urls')),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-# Solo en desarrollo, para servir archivos estáticos y multimedia
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) 
+# # Solo en desarrollo, para servir archivos estáticos y multimedia
+# if settings.DEBUG:
+#     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) 
 
     
 

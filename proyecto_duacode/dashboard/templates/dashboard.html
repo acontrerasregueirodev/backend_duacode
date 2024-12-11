@@ -90,88 +90,99 @@
           </div>
 
           <!-- Tabla de empleados -->
-          <div class="card mt-4">
-            <div class="card-header">
-              <div class="d-flex justify-content-between align-items-center">
-                <h1 class="card-title mb-0">Empleados</h1>
+<div class="card mt-4">
+  <div class="card-header">
+    <div class="d-flex justify-content-between align-items-center">
+      <h1 class="card-title mb-0">Empleados</h1>
 
-                <!-- Paginación en el encabezado -->
-                <div class="d-flex gap-2">
-                  <span class="mr-2">
-                    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
-                  </span>
-                  {% if page_obj.has_previous %}
-                    <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-secondary btn-sm mr-2">Anterior</a>
-                  {% else %}
-                    <span class="btn btn-secondary btn-sm disabled mr-2">Anterior</span>
-                  {% endif %}
-                  {% if page_obj.has_next %}
-                    <a href="?page={{ page_obj.next_page_number }}" class="btn btn-secondary btn-sm">Siguiente</a>
-                  {% else %}
-                    <span class="btn btn-secondary btn-sm disabled">Siguiente</span>
-                  {% endif %}
-                </div>
-              </div>
-            </div>
-            <div class="card-body p-0">
-              <table class="table table-sm table-bordered table-hover">
-                <thead>
-                  <tr>
-                    <th>Nombre</th>
-                    <th>Apellido</th>
-                    <th>Rol</th>
-                    <th>Proyectos</th>
-                    <th>Eventos Asistidos</th>
-                    <th>Supervisor</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for empleado in page_obj %}
-                  <tr>
-                    <td>{{ empleado.nombre }}</td>
-                    <td>{{ empleado.apellido_1 }}</td>
-                    <td>{{ empleado.rol }}</td>
-                    <td>
-                      {% for proyecto in proyectos_lista %}
-                        {% if proyecto.empleado_id == empleado.id %}
-                          {{ proyecto.proyectos_count }}
-                        {% endif %}
-                      {% endfor %}
-                    </td>
-                    <td>
-                      {% for proyecto in proyectos_lista %}
-                        {% if proyecto.empleado_id == empleado.id %}
-                          {{ proyecto.reuniones_asistidas }}
-                        {% endif %}
-                      {% endfor %}
-                    </td>
-                    <td>
-                      {% if empleado.supervisor %}
-                        {{ empleado.supervisor.nombre }} {{ empleado.supervisor.apellido_1 }} {{ empleado.supervisor.apellido_2 }}
-                      {% else %}
-                        No tiene supervisor
-                      {% endif %}
-                    </td>
-                    <td>
-                      <a href="#" class="btn btn-info btn-sm" onclick="abrirModalEditar({{ empleado.id }}, '{{ empleado.nombre }}', '{{ empleado.apellido_1 }}', '{{ empleado.rol }}', '{{ empleado.supervisor.nombre }}')">
-  <i class="fa fa-pencil-alt"></i> Editar
-</a>
-                                  <!-- Pasamos el ID del empleado a través del atributo data-id -->
-                    <a href="#" class="btn btn-danger btn-sm" onclick="$('#modaleliminarempleado').modal('show'); showDeleteModal({{ empleado.id }});">
-                        <i class="fas fa-trash-alt"></i> Borrar
-                    </a>
-                    </td>
-                  </tr>
-                  {% empty %}
-                  <tr>
-                    <td colspan="6" class="text-center">No hay empleados registrados.</td>
-                  </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            </div>
-          </div>
+      <!-- Paginación en el encabezado -->
+      <div class="d-flex gap-2">
+        <span class="mr-2">
+          Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+        </span>
+        {% if page_obj.has_previous %}
+          <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-secondary btn-sm mr-2">Anterior</a>
+        {% else %}
+          <span class="btn btn-secondary btn-sm disabled mr-2">Anterior</span>
+        {% endif %}
+        {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}" class="btn btn-secondary btn-sm">Siguiente</a>
+        {% else %}
+          <span class="btn btn-secondary btn-sm disabled">Siguiente</span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="card-body p-0">
+    <table class="table table-sm table-bordered table-hover">
+      <thead>
+        <tr>
+          <th>Foto</th>
+          <th>Nombre</th>
+          <th>Apellido</th>
+          <th>Rol</th>
+          <th>Proyectos</th>
+          <th>Eventos Asistidos</th>
+          <th>Supervisor</th>
+          <th>Sede</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for empleado in page_obj %}
+        <tr>
+<td>
+<img src="/media/{{ empleado.foto }}" alt="Foto de {{ empleado.nombre }}" class="img-thumbnail" style="width: 50px; height: 50px;">
+</td>
+          <td>{{ empleado.nombre }}</td>
+          <td>{{ empleado.apellido_1 }}</td>
+          <td>{{ empleado.rol }}</td>
+          <td>
+            {% for proyecto in proyectos_lista %}
+              {% if proyecto.empleado_id == empleado.id %}
+                {{ proyecto.proyectos_count }}
+              {% endif %}
+            {% endfor %}
+          </td>
+          <td>
+            {% for proyecto in proyectos_lista %}
+              {% if proyecto.empleado_id == empleado.id %}
+                {{ proyecto.reuniones_asistidas }}
+              {% endif %}
+            {% endfor %}
+          </td>
+          <td>
+            {% if empleado.supervisor %}
+              {{ empleado.supervisor.nombre }} {{ empleado.supervisor.apellido_1 }} {{ empleado.supervisor.apellido_2 }}
+            {% else %}
+              No tiene supervisor
+            {% endif %}
+          </td>
+          <td> 
+          {{ empleado.sede.nombre }}  
+          </td>
+          <td>
+            <a href="#" class="btn btn-info btn-sm" onclick="abrirModalEditar(
+              {{ empleado.id }},'{{ empleado.nombre }}', '{{ empleado.apellido_1 }}', 
+               '{{ empleado.apellido_2 }}','{{ empleado.email }}', '{{ empleado.telefono }}','{{ empleado.fecha_contratacion|date:"Y-m-d"|escapejs }}',
+               '{{ empleado.cumpleanos|date:"Y-m-d"|escapejs }}')">
+              <i class="fa fa-pencil-alt"></i> Editar
+            </a>
+            <a href="#" class="btn btn-danger btn-sm" onclick="$('#modaleliminarempleado').modal('show'); showDeleteModal({{ empleado.id }});">
+              <i class="fas fa-trash-alt"></i> Borrar
+            </a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="8" class="text-center">No hay empleados registrados.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
         </div>
       </div>
     </div>
@@ -245,12 +256,25 @@
     </script>
     
     <script>
-      function abrirModalEditar(id, nombre, apellido, rol, supervisor) {
+function abrirModalEditar(id, nombre, apellido1, apellido2, email, telefono, fechaContratacion, cumpleanos, fotoUrl, rol, sede, baja, excedencia, teletrabajo, vacaciones, supervisor, qrCode) {
   // Asignar los valores a los campos del formulario
+  //document.getElementById('fotoEmpleado').value = foto;
   document.getElementById('nombreEmpleado').value = nombre;
-  document.getElementById('apellidoEmpleado').value = apellido;
+  document.getElementById('apellidoEmpleado1').value = apellido1;
+  document.getElementById('apellidoEmpleado2').value = apellido2;
+  document.getElementById('emailEmpleado').value = email;
+  document.getElementById('telefonoEmpleado').value = telefono;
+  document.getElementById('fechaContratacionEmpleado').value = fechaContratacion;
+  document.getElementById('cumpleanosEmpleado').value = cumpleanos;
+//document.getElementById('fotoEmpleado').src = fotoUrl ? fotoUrl : '/static/default-qr.png';
   document.getElementById('rolEmpleado').value = rol;
-  document.getElementById('supervisorEmpleado').value = supervisor;
+  document.getElementById('sedeEmpleado').value = sede ;
+  document.getElementById('bajaEmpleado').checked = baja;
+  document.getElementById('excedenciaEmpleado').checked = excedencia;
+  document.getElementById('teletrabajoEmpleado').checked = teletrabajo;
+  document.getElementById('vacacionesEmpleado').checked = vacaciones;
+  //document.getElementById('supervisorEmpleado').value = supervisor;
+  //document.getElementById('qrEmpleado').src = qrCode ? qrCode : '/static/default-qr.png';  // Ruta por defecto si no tiene QR
 
   // Abrir la modal
   $('#modalEditarEmpleado').modal('show');
@@ -258,6 +282,7 @@
   // Asignar un identificador al botón de guardar para que se pueda realizar la edición en el backend
   document.getElementById('guardarCambios').setAttribute('data-id', id);
 }
+
 
 document.getElementById('guardarCambios').addEventListener('click', function() {
   const empleadoId = this.getAttribute('data-id');

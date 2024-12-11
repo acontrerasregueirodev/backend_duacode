@@ -10,28 +10,81 @@
       </div>
       <div class="modal-body">
         <form id="form-editar-empleado">
-          <!-- Aquí puedes colocar los campos para editar los datos del empleado -->
+                    {% comment %} <div class="form-group">
+            <label for="fotoEmpleado">Foto:</label>
+<img id="fotoEmpleado" src="/media/empleados/{{ empleado.foto }}"alt="Foto del empleado" class="img-fluid" />
+</div> {% endcomment %}
           <div class="form-group">
             <label for="nombreEmpleado">Nombre</label>
             <input type="text" class="form-control" id="nombreEmpleado" required>
           </div>
           <div class="form-group">
-            <label for="apellidoEmpleado">Apellido</label>
-            <input type="text" class="form-control" id="apellidoEmpleado" required>
+            <label for="apellidoEmpleado1">Primer Apellido</label>
+            <input type="text" class="form-control" id="apellidoEmpleado1" required>
           </div>
+          <div class="form-group">
+            <label for="apellidoEmpleado2">Segundo Apellido</label>
+            <input type="text" class="form-control" id="apellidoEmpleado2" required>
+          </div>
+          <div class="form-group">
+            <label for="emailEmpleado">Email</label>
+            <input type="email" class="form-control" id="emailEmpleado" required>
+          </div>
+          <div class="form-group">
+            <label for="telefonoEmpleado">Teléfono</label>
+            <input type="text" class="form-control" id="telefonoEmpleado">
+          </div>
+          <div class="form-group">
+            <label for="fechaContratacionEmpleado">Fecha de Contratación</label>
+            <input type="date" class="form-control" id="fechaContratacionEmpleado" required>
+          </div>
+          <div class="form-group">
+            <label for="cumpleanosEmpleado">Cumpleaños</label>
+            <input type="date" class="form-control" id="cumpleanosEmpleado" required>
+          </div>
+          {% comment %} <div class="form-group">
+            <label for="fotoEmpleado">Foto:</label>
+            <!-- Mostrar la foto actual del empleado -->
+            <img id="fotoEmpleado" src="/media/{{ empleado.foto }}" alt="Foto de {{ empleado.nombre }}" class="img-thumbnail" style="width: 50px; height: 50px;" />
+          </div> {% endcomment %}
+
           <div class="form-group">
             <label for="rolEmpleado">Rol</label>
             <select class="form-control" id="rolEmpleado">
-              <!-- Aquí puedes añadir los roles disponibles -->
+              <!-- Asegúrate de pasar correctamente los valores de rol desde el backend -->
               <option value="1">Administrador</option>
               <option value="2">Empleado</option>
               <option value="3">Supervisor</option>
             </select>
           </div>
           <div class="form-group">
+            <label for="sedeEmpleado">Sede</label>
+            <input type="text" class="form-control" id="sedeEmpleado">
+          </div>
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="bajaEmpleado">
+            <label class="form-check-label" for="bajaEmpleado">Baja</label>
+          </div>
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="excedenciaEmpleado">
+            <label class="form-check-label" for="excedenciaEmpleado">Excedencia</label>
+          </div>
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="teletrabajoEmpleado">
+            <label class="form-check-label" for="teletrabajoEmpleado">Teletrabajo</label>
+          </div>
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="vacacionesEmpleado">
+            <label class="form-check-label" for="vacacionesEmpleado">Vacaciones</label>
+          </div>
+          {% comment %} <div class="form-group">
             <label for="supervisorEmpleado">Supervisor</label>
             <input type="text" class="form-control" id="supervisorEmpleado">
-          </div>
+          </div> {% endcomment %}
+          {% comment %} <div class="form-group">
+            <label for="qrEmpleado">Código QR</label>
+            <img id="qrEmpleado" src="/static/default-qr.png" class="img-fluid" alt="Código QR">
+          </div> {% endcomment %}
         </form>
       </div>
       <div class="modal-footer">
@@ -41,4 +94,3 @@
     </div>
   </div>
 </div>
-
