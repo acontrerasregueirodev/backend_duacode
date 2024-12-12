@@ -32,7 +32,7 @@ class EmpleadoSerializer(serializers.ModelSerializer):
     rol = serializers.PrimaryKeyRelatedField(queryset=RolModel.objects.all())
     sede = serializers.PrimaryKeyRelatedField(queryset=Sede.objects.all())
     # rol = RolModelSerializer()    
-    rol_display = serializers.CharField(source='rol.rol_display', read_only=True)  # Añadir el nombre legible del rol
+    rol_display = serializers.SerializerMethodField()  # Añadir el nombre legible del rol
     # sede = SedeSerializer()
     # proyecto = ProyectoSerializer()
     # Para incluir el supervisor, que se obtiene a través del modelo Empleado
@@ -47,7 +47,13 @@ class EmpleadoSerializer(serializers.ModelSerializer):
             'cumpleanos', 'foto', 'rol','rol_display', 'sede', 'baja', 'excedencia', 'teletrabajo', 'vacaciones', 'qr_code',
             'supervisor'
         ]
-    
+    def get_rol_display(self, obj):
+        """
+        Devuelve el nombre legible del rol asociado al empleado.
+        """
+        rol_map = dict(RolModel.ROL_CHOICES)
+        return rol_map.get(obj.rol.nombre, obj.rol.nombre)
+
     def get_supervisor(self, obj):
         """
         Devuelve la información del supervisor (nombre) del empleado.
