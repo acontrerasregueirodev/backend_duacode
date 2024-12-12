@@ -1,7 +1,7 @@
-{% extends 'base.html' %} 
+{% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Protocolos{% endblock %} 
+{% block title %}Protocolos{% endblock %}
 {% block extra_head %} <!-- Incluir scripts o estilos adicionales aquí si es necesario --> 
 {% endblock %}
 {% block content %}
@@ -27,7 +27,9 @@
             <label for="file" class="mr-2">Archivo</label>
             <input type="file" class="form-control-file" id="file" name="file" required>
           </div>
-          <button type="submit" class="btn btn-primary" id="submit-btn">Añadir Protocolo</button>
+          <button type="submit" class="btn btn-primary" id="submit-btn">
+            <i class="fas fa-plus-circle"></i> Añadir Protocolo
+          </button>
         </div>
       </div>
     </form>
@@ -59,9 +61,13 @@
             <td>{{ protocolo.uploaded_at }}</td>
             <td>{{ protocolo.file }}</td>
             <td>
-              <!-- Aquí puedes agregar botones de editar o eliminar -->
-              <button class="btn btn-info btn-sm">Editar</button>
-              <button class="btn btn-danger btn-sm">Eliminar</button>
+              <!-- Botones con iconos -->
+              <button class="btn btn-info btn-sm">
+                <i class="fas fa-edit"></i> Editar
+              </button>
+              <button class="btn btn-danger btn-sm">
+                <i class="fas fa-trash-alt"></i> Eliminar
+              </button>
             </td>
           </tr>
           {% empty %}
@@ -76,6 +82,7 @@
     </div>
   </div>
 </div>
+
 <script>
   document.getElementById('submit-btn').addEventListener('click', function(e) {
     e.preventDefault();  // Prevenir el comportamiento por defecto del formulario
@@ -124,7 +131,5 @@
     });
   });
 </script>
-
-   
 
 {% endblock %}
