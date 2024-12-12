@@ -1,0 +1,53 @@
+<!-- Modal Añadir Proyecto -->
+<div class="modal fade" id="modalAnadirProyecto" tabindex="-1" role="dialog" aria-labelledby="modalAnadirProyectoLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalAnadirProyectoLabel">Añadir Proyecto</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="form-anadir-proyecto">
+          <div class="row">
+            <!-- Columna 1 -->
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="nombreProyectoAnadir">Nombre</label>
+                <input type="text" class="form-control" id="nombreProyectoAnadir" name="nombreProyectoAnadir" required>
+              </div>
+              <div class="form-group">
+                <label for="descripcionProyectoAnadir">Descripción</label>
+                <textarea class="form-control" id="descripcionProyectoAnadir" name="descripcionProyectoAnadir" rows="4" required></textarea>
+              </div>
+              <div class="form-group">
+                <label for="fechaInicioProyectoAnadir">Fecha de Inicio</label>
+                <input type="date" class="form-control" id="fechaInicioProyectoAnadir" name="fechaInicioProyectoAnadir" required>
+              </div>
+            </div>
+
+            <!-- Columna 2 -->
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="fechaFinProyectoAnadir">Fecha de Finalización</label>
+                <input type="date" class="form-control" id="fechaFinProyectoAnadir" name="fechaFinProyectoAnadir">
+              </div>
+              <div class="form-group">
+                <label for="empleadosProyectoAnadir">Empleados</label>
+                <select class="form-control" id="empleadosProyectoAnadir" name="empleadosProyectoAnadir" multiple>
+                  <!-- Los empleados se agregarán dinámicamente aquí -->
+                </select>
+                <small class="form-text text-muted">Mantén presionada la tecla Ctrl o Cmd para seleccionar múltiples empleados.</small>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        <button type="button" class="btn btn-primary" id="guardarProyectoBtn">Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
