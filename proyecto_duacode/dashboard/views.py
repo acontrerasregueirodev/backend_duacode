@@ -11,7 +11,7 @@ from subir_archivo.models import SubirArchivo
 
 def dashboard(request):
     # Obtener todos los empleados
-    empleados = Empleado.objects.all()
+    empleados = Empleado.objects.all().order_by('id')
 
     # Configurar la paginación
     paginator = Paginator(empleados, 10)  # 10 empleados por página
