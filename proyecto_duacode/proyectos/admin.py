@@ -2,7 +2,7 @@ from django.contrib import admin
 from .models import Proyecto
 
 class ProyectoAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'fecha_inicio', 'fecha_fin')  # Campos a mostrar en la lista
+    list_display = ('nombre','descripcion', 'fecha_inicio', 'fecha_fin')  # Campos a mostrar en la lista
     search_fields = ('nombre',)  # Habilitar búsqueda por nombre
     list_filter = ('fecha_inicio', 'fecha_fin')  # Habilitar filtros por fechas
 

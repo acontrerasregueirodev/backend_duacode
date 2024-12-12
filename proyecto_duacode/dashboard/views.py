@@ -8,7 +8,6 @@ from sedes.models import ReservaSala, Sede
 from proyectos.models import Proyecto  
 from subir_archivo.models import SubirArchivo
 
-
 def dashboard(request):
     # Obtener todos los empleados
     empleados = Empleado.objects.all().order_by('id')

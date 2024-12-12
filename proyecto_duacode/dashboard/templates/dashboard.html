@@ -362,36 +362,34 @@ fetch(`/api/empleados/${empleadoId}/`, {
   });
 </script>
 <script>
-    document.getElementById("guardarEmpleadoBtn").addEventListener("click", function () {
+document.getElementById("guardarEmpleadoBtn").addEventListener("click", function () {
     const form = document.getElementById("form-anadir-empleado");
     const formData = new FormData();
-formData.append("nombre", document.getElementById("nombreEmpleadoanadir").value);
-formData.append("apellido_1", document.getElementById("apellidoEmpleado1anadir").value);
-formData.append("apellido_2", document.getElementById("apellidoEmpleado2anadir").value);
-formData.append("email", document.getElementById("emailEmpleadoanadir").value);
-formData.append("fecha_contratacion", document.getElementById("fechaContratacionEmpleadoanadir").value);
-formData.append("cumpleanos", document.getElementById("cumpleanosEmpleadoanadir").value);
-formData.append("telefono", document.getElementById("telefonoEmpleadoanadir").value);
-formData.append("rol", document.getElementById("rolEmpleadoanadir").value);
-formData.append("sede", document.getElementById("sedeEmpleadoanadir").value);
-// Checkboxes: Convertir los checkboxes a Boolean (True/False) o lo que necesites en el backend
-formData.append("baja", document.getElementById("bajaEmpleadoanadir").checked);
+    formData.append("nombre", document.getElementById("nombreEmpleadoanadir").value);
+    formData.append("apellido_1", document.getElementById("apellidoEmpleado1anadir").value);
+    formData.append("apellido_2", document.getElementById("apellidoEmpleado2anadir").value);
+    formData.append("email", document.getElementById("emailEmpleadoanadir").value);
+    formData.append("fecha_contratacion", document.getElementById("fechaContratacionEmpleadoanadir").value);
+    formData.append("cumpleanos", document.getElementById("cumpleanosEmpleadoanadir").value);
+    formData.append("telefono", document.getElementById("telefonoEmpleadoanadir").value);
+    formData.append("rol", document.getElementById("rolEmpleadoanadir").value);
+    formData.append("sede", document.getElementById("sedeEmpleadoanadir").value);
+    // Checkboxes: Convertir los checkboxes a Boolean (True/False) o lo que necesites en el backend
+    formData.append("baja", document.getElementById("bajaEmpleadoanadir").checked);
     formData.append("excedencia", document.getElementById("excedenciaEmpleadoanadir").checked);
     formData.append("teletrabajo", document.getElementById("teletrabajoEmpleadoanadir").checked);
     formData.append("vacaciones", document.getElementById("vacacionesEmpleadoanadir").checked);
+
 function getCookie(name) {
     let match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-    if (match) return match[2];
-    
+    if (match) return match[2];    
     return null;
 }
     // Access Token (supongamos que lo tienes almacenado en una variable o en localStorage)
         const accessToken = getCookie('access_token');
         const refreshToken = getCookie('refresh_token');
         console.log("Contenido del FormData:");
-    for (const [key, value] of formData.entries()) {
-        console.log(`${key}: ${value}`);
-    }
+
     // Enviar los datos al backend
     fetch("/api/empleados/", { // Cambia esta URL por la correcta en tu proyecto
         method: "POST",
@@ -465,7 +463,5 @@ document.addEventListener("DOMContentLoaded", () => {
 </script> 
   </body>
 </html>
-
-
 
 {% endblock %}

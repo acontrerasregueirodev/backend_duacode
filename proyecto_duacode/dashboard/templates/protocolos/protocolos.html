@@ -8,140 +8,77 @@
     
       <!-- Contenido de la página -->
        {% block content %}
-        <div class="container-fluid">
-          <!-- Gráficos -->
-          <div class="row">
-            <div class="col-md-6">
-              <div class="card">
-                <div class="card-header">
-                  <h3 class="card-title">Eventos por sede</h3>
-                </div>
-                <div class="card-body">
-                  <canvas id="grafico-sedes"></canvas>
-                </div>
-              </div>
-            </div>
-
-            <!-- Segundo gráfico: Total de empleados por proyecto -->
-            <div class="col-md-6">
-              <div class="card">
-                <div class="card-header">
-                  <h3 class="card-title">Total de Empleados por Proyecto</h3>
-                </div>
-                <div class="card-body">
-                  <canvas id="grafico-empleados-proyecto"></canvas>
-                </div>
-              </div>
+       <div class="container-fluid">
+        <!-- Tabla de protocolos -->
+        <div class="card mt-4">
+          <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+              <h1 class="card-title mb-0">Protocolos</h1>
+              <a
+                href="#"
+                class="btn btn-primary btn-sm"
+                onclick="$('#modalAnadirProtocolo').modal('show');"
+              >
+                <i class="fas fa-plus"></i> Agregar Protocolo
+              </a>
             </div>
           </div>
-          <!-- Tabla de empleados -->
-      <div class="card mt-4">
-        <div class="card-header">
-          <div class="d-flex justify-content-between align-items-center">
-            <h1 class="card-title mb-0">Empleados</h1>
-              <a href="#" class="btn btn-primary btn-sm" onclick="$('#modalAnadirEmpleado').modal('show');">
-              <i class="fas fa-user-plus"></i> Agregar Empleado
-            </a>
-            <!-- Paginación en el encabezado -->
-            <div class="d-flex gap-2">
-              <span class="mr-2">
-                Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
-              </span>
-              {% if page_obj.has_previous %}
-                <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-secondary btn-sm mr-2">Anterior</a>
-              {% else %}
-                <span class="btn btn-secondary btn-sm disabled mr-2">Anterior</span>
-              {% endif %}
-              {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}" class="btn btn-secondary btn-sm">Siguiente</a>
-              {% else %}
-                <span class="btn btn-secondary btn-sm disabled">Siguiente</span>
-              {% endif %}
-            </div>
+          <div class="card-body p-0">
+            <table class="table table-sm table-bordered table-hover">
+              <thead>
+                <tr>
+                  <th>Nombre Protocolo</th>
+                  <th>Descripción</th>
+                  <th>Fecha de Creación</th>
+                  <th>Última Actualización</th>
+                  <th>Responsable</th>
+                  <th>Documentos Asociados</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for protocolo in protocolos_lista %}
+                <tr>
+                  <td>{{ protocolo.nombre }}</td>
+                  <td>{{ protocolo.descripcion }}</td>
+                  <td>{{ protocolo.fecha_creacion }}</td>
+                  <td>{{ protocolo.ultima_actualizacion }}</td>
+                  <td>
+                    {% if protocolo.responsable %}
+                      {{ protocolo.responsable.nombre }}
+                    {% else %}
+                      Sin asignar
+                    {% endif %}
+                  </td>
+                  <td>
+                    <ul class="list-unstyled mb-0">
+                      {% for documento in protocolo.documentos.all %}
+                      <li><a href="{{ documento.url }}" target="_blank">{{ documento.nombre }}</a></li>
+                      {% empty %}
+                      <li>No hay documentos asociados</li>
+                      {% endfor %}
+                    </ul>
+                  </td>
+                  <td>
+                    <!-- Aquí puedes agregar botones de editar o eliminar -->
+                    <button class="btn btn-info btn-sm">Editar</button>
+                    <button class="btn btn-danger btn-sm">Eliminar</button>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="7" class="text-center">
+                    No hay protocolos disponibles.
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
           </div>
         </div>
-        <div class="card-body p-0">
-          <table class="table table-sm table-bordered table-hover">
-            <thead>
-              <tr>
-                {% comment %} <th>Foto</th> {% endcomment %}
-                <th>Nombre</th>
-                <th>Apellido</th>
-                <th>Rol</th>
-                <th>Proyectos</th>
-                <th>Eventos Asistidos</th>
-                <th>Supervisor</th>
-                <th>Sede</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for empleado in page_obj %}
-              <tr>
-      {% comment %} <td>
-      <img src="/media/{{ empleado.foto }}" alt="Foto de {{ empleado.nombre }}" class="img-thumbnail" style="width: 50px; height: 50px;">
-      </td> {% endcomment %}
-                <td>{{ empleado.nombre }}</td>
-                <td>{{ empleado.apellido_1 }}</td>
-                <td>{{ empleado.rol }}</td>
-                <td>
-                  {% for proyecto in proyectos_lista %}
-                    {% if proyecto.empleado_id == empleado.id %}
-                      {{ proyecto.proyectos_count }}
-                    {% endif %}
-                  {% endfor %}
-                </td>
-                <td>
-                  {% for proyecto in proyectos_lista %}
-                    {% if proyecto.empleado_id == empleado.id %}
-                      {{ proyecto.reuniones_asistidas }}
-                    {% endif %}
-                  {% endfor %}
-                </td>
-                <td>
-                  {% if empleado.supervisor %}
-                    {{ empleado.supervisor.nombre }} {{ empleado.supervisor.apellido_1 }} {{ empleado.supervisor.apellido_2 }}
-                  {% else %}
-                    No tiene supervisor
-                  {% endif %}
-                </td>
-                <td> 
-                {{ empleado.sede.nombre }}  
-                </td>
-                <td>
-            <a href="#" class="btn btn-info btn-sm" onclick="abrirModalEditar(
-              {{ empleado.id }},
-              '{{ empleado.nombre }}',
-              '{{ empleado.apellido_1 }}',
-              '{{ empleado.apellido_2 }}',
-              '{{ empleado.email }}',
-              '{{ empleado.telefono }}',
-              '{{ empleado.fecha_contratacion|date:"Y-m-d"|escapejs }}',
-              '{{ empleado.cumpleanos|date:"Y-m-d"|escapejs }}',
-              '{{ empleado.rol.id }}',
-              '{{ empleado.sede.id }}',
-              '{{ empleado.baja }}',
-              '{{ empleado.excedencia }}',
-              '{{ empleado.teletrabajo }}',
-              '{{ empleado.vacaciones }}'
-              )">   <i class="fa fa-pencil-alt"></i> Editar              
-            </a>
-            <a href="#" class="btn btn-danger btn-sm" onclick="$('#modaleliminarempleado').modal('show'); showDeleteModal({{ empleado.id }});">
-                    <i class="fas fa-trash-alt"></i> Borrar
-                  </a>
-                </td>
-              </tr>
-              {% empty %}
-              <tr>
-                <td colspan="8" class="text-center">No hay empleados registrados.</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
       </div>
-      </div>
-    </div>
-    
+      
+      <!-- Modal para agregar nuevo protocolo -->
+      {% comment %} {% include './modal_anadir_protocolo.html' %}      {% endcomment %}
 
 {% endblock %}
