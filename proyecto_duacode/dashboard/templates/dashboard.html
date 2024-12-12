@@ -208,128 +208,128 @@
       });
     </script>    
     <script>
-function abrirModalEditar(id, nombre, apellido1, apellido2, email, telefono, fechaContratacion, cumpleanos, rol, sede, baja, excedencia, teletrabajo, vacaciones, supervisor, qrCode) {
-  document.getElementById('nombreEmpleado').value = nombre;
-    document.getElementById('apellidoEmpleado1').value = apellido1;
-    document.getElementById('apellidoEmpleado2').value = apellido2;
-    document.getElementById('emailEmpleado').value = email;
-    document.getElementById('telefonoEmpleado').value = telefono;
-    document.getElementById('fechaContratacionEmpleado').value = fechaContratacion;
-    document.getElementById('cumpleanosEmpleado').value = cumpleanos;
-    document.getElementById('rolEmpleado').value = rol;
-    document.getElementById('sedeEmpleado').value = sede;
-    const convertirBooleano = (valor) => valor === "True";
-    document.getElementById('bajaEmpleado').checked = convertirBooleano(baja);
-    document.getElementById('excedenciaEmpleado').checked = convertirBooleano(excedencia);
-    document.getElementById('teletrabajoEmpleado').checked = convertirBooleano(teletrabajo);
-    document.getElementById('vacacionesEmpleado').checked = convertirBooleano(vacaciones);
-cargarSelects();
-  // Abrir la modal
-  $('#modalEditarEmpleado').modal('show');
-function cargarSelects() {
-    // Aquí deberías tener los valores de roles y sedes (puedes cargarlos desde un archivo JS, hacer una petición AJAX al backend, etc.)
-    const roles = [
-    {"id": 1,"nombre": "CEO","rol_display": "CEO"},
-    {"id": 2,"nombre": "CTO","rol_display": "CTO"},
-    {"id": 3,"nombre": "LÍDER_DESARROLLO","rol_display": "Líder de Equipo de Desarrollo"},
-    {"id": 4,"nombre": "INGENIERO_FRONTEND","rol_display": "Ingeniero de Frontend"},
-    {"id": 5,"nombre": "INGENIERO_BACKEND","rol_display": "Ingeniero de Backend"},
-    {"id": 6,"nombre": "LÍDER_QA","rol_display": "Líder de QA"},
-    {"id": 7,"nombre": "INGENIERO_QA","rol_display": "Ingeniero de QA"},
-    {"id": 8,"nombre": "GERENTE_PROYECTO","rol_display": "Gerente de Proyecto"},
-    {"id": 9,"nombre": "COORDINADOR_PROYECTO","rol_display": "Coordinador de Proyecto"},
-    {"id": 10,"nombre": "CFO","rol_display": "CFO"},
-    {"id": 11,"nombre": "GERENTE_PRODUCTO","rol_display": "Gerente de Producto"},
-    {"id": 12,"nombre": "PROPIETARIO_PRODUCTO","rol_display": "Propietario de Producto"},
-    {"id": 13,"nombre": "GERENTE_MARKETING","rol_display": "Gerente de Marketing"},
-    {"id": 14,"nombre": "ESPECIALISTA_MARKETING","rol_display": "Especialista en Marketing Digital"},
-    {"id": 15,"nombre": "GERENTE_VENTAS","rol_display": "Gerente de Ventas"},
-    {"id": 16,"nombre": "REPRESENTANTE_VENTAS","rol_display": "Representante de Ventas"},
-    {"id": 17,"nombre": "GERENTE_SOPORTE","rol_display": "Gerente de Soporte"},
-    {"id": 18,"nombre": "ESPECIALISTA_SOPORTE","rol_display": "Especialista en Soporte al Cliente"}
-    ];
-    const sedes = [
-    {"id": 1,"nombre": "Sede Principal","direccion": "Camino de Eugenio Casanova 78\nGirona, 31485", "ciudad": "Asturias", "pais": "Côte d'Ivoire" },
-    {"id": 2,"nombre": "Sede Secundaria","direccion": "Callejón Florina Fortuny 6\nNavarra, 45066","ciudad": "Pontevedra","pais": "Suecia" },
-    {"id": 3,"nombre": "Sede Internacional","direccion": "Alameda Eva Ramos 10\nAlicante, 26205","ciudad": "Burgos","pais": "República Democrática del Congo"}
-    ];
-    // Llenar el select de roles
-    const selectRol = document.getElementById('rolEmpleado');
-    selectRol.innerHTML = ''; // Limpiar el select antes de añadir opciones
-    roles.forEach(rol => {
-        const option = document.createElement('option');
-        option.value = rol.id;
-        option.textContent = rol.nombre;
-        selectRol.appendChild(option);
+    function abrirModalEditar(id, nombre, apellido1, apellido2, email, telefono, fechaContratacion, cumpleanos, rol, sede, baja, excedencia, teletrabajo, vacaciones, supervisor, qrCode) {
+      document.getElementById('nombreEmpleado').value = nombre;
+        document.getElementById('apellidoEmpleado1').value = apellido1;
+        document.getElementById('apellidoEmpleado2').value = apellido2;
+        document.getElementById('emailEmpleado').value = email;
+        document.getElementById('telefonoEmpleado').value = telefono;
+        document.getElementById('fechaContratacionEmpleado').value = fechaContratacion;
+        document.getElementById('cumpleanosEmpleado').value = cumpleanos;
+        document.getElementById('rolEmpleado').value = rol;
+        document.getElementById('sedeEmpleado').value = sede;
+        const convertirBooleano = (valor) => valor === "True";
+        document.getElementById('bajaEmpleado').checked = convertirBooleano(baja);
+        document.getElementById('excedenciaEmpleado').checked = convertirBooleano(excedencia);
+        document.getElementById('teletrabajoEmpleado').checked = convertirBooleano(teletrabajo);
+        document.getElementById('vacacionesEmpleado').checked = convertirBooleano(vacaciones);
+    cargarSelects();
+      // Abrir la modal
+      $('#modalEditarEmpleado').modal('show');
+    function cargarSelects() {
+        // Aquí deberías tener los valores de roles y sedes (puedes cargarlos desde un archivo JS, hacer una petición AJAX al backend, etc.)
+        const roles = [
+        {"id": 1,"nombre": "CEO","rol_display": "CEO"},
+        {"id": 2,"nombre": "CTO","rol_display": "CTO"},
+        {"id": 3,"nombre": "LÍDER_DESARROLLO","rol_display": "Líder de Equipo de Desarrollo"},
+        {"id": 4,"nombre": "INGENIERO_FRONTEND","rol_display": "Ingeniero de Frontend"},
+        {"id": 5,"nombre": "INGENIERO_BACKEND","rol_display": "Ingeniero de Backend"},
+        {"id": 6,"nombre": "LÍDER_QA","rol_display": "Líder de QA"},
+        {"id": 7,"nombre": "INGENIERO_QA","rol_display": "Ingeniero de QA"},
+        {"id": 8,"nombre": "GERENTE_PROYECTO","rol_display": "Gerente de Proyecto"},
+        {"id": 9,"nombre": "COORDINADOR_PROYECTO","rol_display": "Coordinador de Proyecto"},
+        {"id": 10,"nombre": "CFO","rol_display": "CFO"},
+        {"id": 11,"nombre": "GERENTE_PRODUCTO","rol_display": "Gerente de Producto"},
+        {"id": 12,"nombre": "PROPIETARIO_PRODUCTO","rol_display": "Propietario de Producto"},
+        {"id": 13,"nombre": "GERENTE_MARKETING","rol_display": "Gerente de Marketing"},
+        {"id": 14,"nombre": "ESPECIALISTA_MARKETING","rol_display": "Especialista en Marketing Digital"},
+        {"id": 15,"nombre": "GERENTE_VENTAS","rol_display": "Gerente de Ventas"},
+        {"id": 16,"nombre": "REPRESENTANTE_VENTAS","rol_display": "Representante de Ventas"},
+        {"id": 17,"nombre": "GERENTE_SOPORTE","rol_display": "Gerente de Soporte"},
+        {"id": 18,"nombre": "ESPECIALISTA_SOPORTE","rol_display": "Especialista en Soporte al Cliente"}
+        ];
+        const sedes = [
+        {"id": 1,"nombre": "Sede Principal","direccion": "Camino de Eugenio Casanova 78\nGirona, 31485", "ciudad": "Asturias", "pais": "Côte d'Ivoire" },
+        {"id": 2,"nombre": "Sede Secundaria","direccion": "Callejón Florina Fortuny 6\nNavarra, 45066","ciudad": "Pontevedra","pais": "Suecia" },
+        {"id": 3,"nombre": "Sede Internacional","direccion": "Alameda Eva Ramos 10\nAlicante, 26205","ciudad": "Burgos","pais": "República Democrática del Congo"}
+        ];
+        // Llenar el select de roles
+        const selectRol = document.getElementById('rolEmpleado');
+        selectRol.innerHTML = ''; // Limpiar el select antes de añadir opciones
+        roles.forEach(rol => {
+            const option = document.createElement('option');
+            option.value = rol.id;
+            option.textContent = rol.nombre;
+            selectRol.appendChild(option);
+        });
+        // Llenar el select de sedes
+        const selectSede = document.getElementById('sedeEmpleado');
+        selectSede.innerHTML = ''; // Limpiar el select antes de añadir opciones
+        sedes.forEach(sede => {
+            const option = document.createElement('option');
+            option.value = sede.id;
+            option.textContent = sede.nombre;
+            selectSede.appendChild(option);
+        });
+    } 
+    document.getElementById('guardarCambios').setAttribute('data-id', id);
+  }
+    document.getElementById('guardarCambios').addEventListener('click', function() {
+      const empleadoId = this.getAttribute('data-id'); // Asumo que el data-id contiene el ID del empleado
+      const nombre = document.getElementById('nombreEmpleado').value;
+      const apellido1 = document.getElementById('apellidoEmpleado1').value;
+      const apellido2 = document.getElementById('apellidoEmpleado2').value;
+      const email = document.getElementById('emailEmpleado').value;
+      const fechaContratacion = document.getElementById('fechaContratacionEmpleado').value;
+      const cumpleanos = document.getElementById('cumpleanosEmpleado').value;
+      const telefono = document.getElementById('telefonoEmpleado').value;
+      const rol =  document.getElementById('rolEmpleado').value ;
+      const sede = document.getElementById('sedeEmpleado').value;
+      const baja = document.getElementById('bajaEmpleado').checked;
+      const excedencia = document.getElementById('excedenciaEmpleado').checked;
+      const teletrabajo = document.getElementById('teletrabajoEmpleado').checked;
+      const vacaciones = document.getElementById('vacacionesEmpleado').checked;
+      const accessToken = getCookie('access_token');
+      const refreshToken = getCookie('refresh_token');
+      // Enviar los datos al servidor para actualizar la información del empleado
+      fetch(`/api/empleados/${empleadoId}/`, {    
+        method: 'PUT',
+            headers: {
+            'X-CSRFToken': getCookie('csrftoken'),  // Token CSRF
+            'Authorization': `Bearer ${accessToken}`,  // Enviar el access_token en el encabezado Authorization
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          nombre: nombre,
+          apellido_1: apellido1,
+          apellido_2: apellido2,
+          email: email,
+          fecha_contratacion: fechaContratacion,
+          cumpleanos: cumpleanos,
+          telefono: telefono,
+          rol: rol,
+          sede: sede,
+          baja: baja,
+          excedencia: excedencia,
+          teletrabajo: teletrabajo,
+          vacaciones: vacaciones
+        })
+      })
+      .then(response => {
+        if (response.ok) {
+          // Cerrar la modal y recargar la página para ver los cambios
+          $('#modalEditarEmpleado').modal('hide');
+          location.reload();
+        } else {
+          alert('Error al guardar los cambios.');
+        }
+      })
+      .catch(error => console.error('Error:', error));
     });
-    // Llenar el select de sedes
-    const selectSede = document.getElementById('sedeEmpleado');
-    selectSede.innerHTML = ''; // Limpiar el select antes de añadir opciones
-    sedes.forEach(sede => {
-        const option = document.createElement('option');
-        option.value = sede.id;
-        option.textContent = sede.nombre;
-        selectSede.appendChild(option);
-    });
-} 
-  document.getElementById('guardarCambios').setAttribute('data-id', id);
-}
-document.getElementById('guardarCambios').addEventListener('click', function() {
-  const empleadoId = this.getAttribute('data-id'); // Asumo que el data-id contiene el ID del empleado
-  const nombre = document.getElementById('nombreEmpleado').value;
-  const apellido1 = document.getElementById('apellidoEmpleado1').value;
-  const apellido2 = document.getElementById('apellidoEmpleado2').value;
-  const email = document.getElementById('emailEmpleado').value;
-  const fechaContratacion = document.getElementById('fechaContratacionEmpleado').value;
-  const cumpleanos = document.getElementById('cumpleanosEmpleado').value;
-  const telefono = document.getElementById('telefonoEmpleado').value;
-  const rol =  document.getElementById('rolEmpleado').value ;
-  const sede = document.getElementById('sedeEmpleado').value;
-  const baja = document.getElementById('bajaEmpleado').checked;
-  const excedencia = document.getElementById('excedenciaEmpleado').checked;
-  const teletrabajo = document.getElementById('teletrabajoEmpleado').checked;
-  const vacaciones = document.getElementById('vacacionesEmpleado').checked;
-  const accessToken = getCookie('access_token');
-  const refreshToken = getCookie('refresh_token');
-  // Enviar los datos al servidor para actualizar la información del empleado
-  fetch(`/api/empleados/${empleadoId}/`, {    
-    method: 'PUT',
-        headers: {
-        'X-CSRFToken': getCookie('csrftoken'),  // Token CSRF
-        'Authorization': `Bearer ${accessToken}`,  // Enviar el access_token en el encabezado Authorization
-        'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      nombre: nombre,
-      apellido_1: apellido1,
-      apellido_2: apellido2,
-      email: email,
-      fecha_contratacion: fechaContratacion,
-      cumpleanos: cumpleanos,
-      telefono: telefono,
-      rol: rol,
-      sede: sede,
-      baja: baja,
-      excedencia: excedencia,
-      teletrabajo: teletrabajo,
-      vacaciones: vacaciones
-    })
-  })
-  .then(response => {
-    if (response.ok) {
-      // Cerrar la modal y recargar la página para ver los cambios
-      $('#modalEditarEmpleado').modal('hide');
-      location.reload();
-    } else {
-      alert('Error al guardar los cambios.');
+    function showDeleteModal(empleadoId) {
+      // Asignar el ID del empleado al botón de confirmación de eliminación
+      document.getElementById('confirmDelete').setAttribute('data-id', empleadoId);
     }
-  })
-  .catch(error => console.error('Error:', error));
-});
-      function showDeleteModal(empleadoId) {
-    // Asignar el ID del empleado al botón de confirmación de eliminación
-    document.getElementById('confirmDelete').setAttribute('data-id', empleadoId);
-}
 function getCookie(name) {
     let match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
     if (match) return match[2];
