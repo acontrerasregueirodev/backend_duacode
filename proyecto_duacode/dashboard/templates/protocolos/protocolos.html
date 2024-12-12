@@ -4,81 +4,127 @@
 {% block title %}Protocolos{% endblock %} 
 {% block extra_head %} <!-- Incluir scripts o estilos adicionales aquí si es necesario --> 
 {% endblock %}
-
-    
-      <!-- Contenido de la página -->
-       {% block content %}
-       <div class="container-fluid">
-        <!-- Tabla de protocolos -->
-        <div class="card mt-4">
-          <div class="card-header">
-            <div class="d-flex justify-content-between align-items-center">
-              <h1 class="card-title mb-0">Protocolos</h1>
-              <a
-                href="#"
-                class="btn btn-primary btn-sm"
-                onclick="$('#modalAnadirProtocolo').modal('show');"
-              >
-                <i class="fas fa-plus"></i> Agregar Protocolo
-              </a>
-            </div>
+{% block content %}
+<div class="container-fluid">
+  <!-- Formulario para agregar nuevo protocolo -->
+  <div class="card mt-4">
+    <div class="card-header">
+      <h5 class="card-title mb-0">Agregar Nuevo Protocolo</h5>
+    </div>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="card-body">
+        <div class="form-group">
+          <label for="titulo">Título</label>
+          <input type="text" class="form-control" id="titulo" name="titulo" maxlength="200" required>
+        </div>
+        <div class="form-group">
+          <label for="descripcion">Descripción</label>
+          <textarea class="form-control" id="descripcion" name="descripcion" rows="3"></textarea>
+        </div>
+        <div class="form-group d-flex justify-content-between align-items-center">
+          <div class="d-flex">
+            <label for="file" class="mr-2">Archivo</label>
+            <input type="file" class="form-control-file" id="file" name="file" required>
           </div>
-          <div class="card-body p-0">
-            <table class="table table-sm table-bordered table-hover">
-              <thead>
-                <tr>
-                  <th>Nombre Protocolo</th>
-                  <th>Descripción</th>
-                  <th>Fecha de Creación</th>
-                  <th>Última Actualización</th>
-                  <th>Responsable</th>
-                  <th>Documentos Asociados</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for protocolo in protocolos_lista %}
-                <tr>
-                  <td>{{ protocolo.nombre }}</td>
-                  <td>{{ protocolo.descripcion }}</td>
-                  <td>{{ protocolo.fecha_creacion }}</td>
-                  <td>{{ protocolo.ultima_actualizacion }}</td>
-                  <td>
-                    {% if protocolo.responsable %}
-                      {{ protocolo.responsable.nombre }}
-                    {% else %}
-                      Sin asignar
-                    {% endif %}
-                  </td>
-                  <td>
-                    <ul class="list-unstyled mb-0">
-                      {% for documento in protocolo.documentos.all %}
-                      <li><a href="{{ documento.url }}" target="_blank">{{ documento.nombre }}</a></li>
-                      {% empty %}
-                      <li>No hay documentos asociados</li>
-                      {% endfor %}
-                    </ul>
-                  </td>
-                  <td>
-                    <!-- Aquí puedes agregar botones de editar o eliminar -->
-                    <button class="btn btn-info btn-sm">Editar</button>
-                    <button class="btn btn-danger btn-sm">Eliminar</button>
-                  </td>
-                </tr>
-                {% empty %}
-                <tr>
-                  <td colspan="7" class="text-center">
-                    No hay protocolos disponibles.
-                  </td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
+          <button type="submit" class="btn btn-primary" id="submit-btn">Añadir Protocolo</button>
         </div>
       </div>
-      
-      <!-- Modal para agregar nuevo protocolo -->
-      {% comment %} {% include './modal_anadir_protocolo.html' %}      {% endcomment %}
+    </form>
+  </div>
+
+  <!-- Tabla de protocolos -->
+  <div class="card mt-4">
+    <div class="card-header">
+      <div class="d-flex justify-content-between align-items-center">
+        <h1 class="card-title mb-0">Protocolos</h1>
+      </div>
+    </div>
+    <div class="card-body p-0">
+      <table class="table table-sm table-bordered table-hover">
+        <thead>
+          <tr>
+            <th>Nombre Protocolo</th>
+            <th>Descripción</th>
+            <th>Fecha de Creación</th>
+            <th>Nombre archivo</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for protocolo in protocolos %}
+          <tr>
+            <td>{{ protocolo.titulo }}</td>
+            <td>{{ protocolo.descripcion }}</td>
+            <td>{{ protocolo.uploaded_at }}</td>
+            <td>{{ protocolo.file }}</td>
+            <td>
+              <!-- Aquí puedes agregar botones de editar o eliminar -->
+              <button class="btn btn-info btn-sm">Editar</button>
+              <button class="btn btn-danger btn-sm">Eliminar</button>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="7" class="text-center">
+              No hay protocolos disponibles.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<script>
+  document.getElementById('submit-btn').addEventListener('click', function(e) {
+    e.preventDefault();  // Prevenir el comportamiento por defecto del formulario
+
+    // Crear un objeto FormData para enviar los datos del formulario
+    const formData = new FormData();    
+    // Obtener los valores de los campos del formulario
+    const titulo = document.getElementById('titulo').value;
+    const descripcion = document.getElementById('descripcion').value;
+    const file = document.getElementById('file').files[0]; // Obtener el archivo seleccionado
+    function getCookie(name) {
+      let match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+      if (match) return match[2];    
+      return null;
+  }
+    // Añadir los datos al objeto FormData
+    formData.append('titulo', titulo);
+    formData.append('descripcion', descripcion);
+    formData.append('file', file);
+
+    // Añadir CSRF token al objeto FormData
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    formData.append('csrfmiddlewaretoken', csrfToken);
+    const accessToken = getCookie('access_token')
+    console.log(accessToken)
+    // Enviar la solicitud POST usando fetch con CSRF y Bearer token en los encabezados
+    fetch('/upload/', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,  // Incluye el token Bearer
+        'X-CSRFToken': csrfToken,  // Incluye el token CSRF
+      },
+      body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.message) {
+        alert('Archivo subido con éxito');
+      } else {
+        alert('Hubo un error al subir el archivo');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Hubo un problema con la subida del archivo');
+    });
+  });
+</script>
+
+   
 
 {% endblock %}

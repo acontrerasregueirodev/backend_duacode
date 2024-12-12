@@ -11,4 +11,4 @@ class SubirArchivo(models.Model):
 
     class Meta:
         db_table = 'subir_archivo'  # Especifica el nombre de la tabla
-
+        

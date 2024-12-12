@@ -108,5 +108,16 @@ def proyectos(request):
 def protocolos(request):
     # Obtener todos los empleados
     protocolos = SubirArchivo.objects.all()
+    print(protocolos)
     context = {'protocolos': protocolos}
     return render(request, 'protocolos/protocolos.html', context)
+    
+    # def get(self, request):
+    #     files = SubirArchivo.objects.all()  # Obtener todos los archivos subidos
+    #     file_list = [{
+    #         "titulo": file.titulo,            # Título del archivo
+    #         "file_name": file.file.name,     # Nombre del archivo
+    #         "descripcion": file.descripcion, # Descripción del archivo
+    #         "uploaded_at": file.uploaded_at  # Fecha de subida
+    #     } for file in files]
+    #     return Response(file_list)
