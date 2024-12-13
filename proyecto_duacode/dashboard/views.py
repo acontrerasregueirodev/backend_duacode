@@ -102,6 +102,7 @@ def dashboard(request):
 
 def proyectos(request):
     proyectos = Proyecto.objects.all()  # Consulta todos los proyectos
+    print(proyectos)
     context = {'proyectos': proyectos}  # Contexto para la plantilla
     return render(request, 'proyectos/proyectos.html', context)
 

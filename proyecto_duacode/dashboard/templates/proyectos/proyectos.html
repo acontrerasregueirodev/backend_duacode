@@ -1,5 +1,7 @@
 {% extends 'base.html' %} 
-{% block title %}Proyectos - Panel de Gestión{%endblock %} 
+
+{% block title %}Proyectos - Panel de Gestión{% endblock %}
+
 {% block content %}
 <div class="container-fluid">
   <!-- Tabla de proyectos -->
@@ -50,7 +52,7 @@
             </td>
             <td>
               <ul class="list-unstyled mb-0">
-                {% for empleado in proyecto.empleados.all %}
+                {% for empleado in proyecto.empleados %}
                 <li>{{ empleado.nombre }}</li>
                 {% empty %}
                 <li>Sin empleados asignados</li>
@@ -83,7 +85,7 @@
   </div>
 </div>
 
-
 <!-- Modal para agregar nuevo proyecto -->
 {% include './modal_anadir_proyecto.html' %} 
+
 {% endblock %}
